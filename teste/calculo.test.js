@@ -92,6 +92,7 @@ test('ler valor em reais como a pessoa digita', () => {
     '': null, '   ': null, '15000': 15000, '15.000': 15000, '15.000,50': 15000.5, 'R$ 2.350': 2350,
     'R$ 15.000,00': 15000, '1.234,56': 1234.56, '39,90': 39.9, '39.90': 39.9, '0': 0,
     '12,345': undefined, 'abc': undefined, '1.23.4': undefined, '-5': undefined, '15.00.000': undefined,
+    '15000,': 15000, '15.000,': 15000, '1.': 1, ',': null, // separador no fim = digitando, não é erro
   };
   for (const [texto, esperado] of Object.entries(casos)) assert.equal(lerValor(texto), esperado, texto);
   assert.equal(valorNoCampo(15000), '15.000');

@@ -20,6 +20,7 @@ const TELEFONES = DESPACHANTE.telefones.map(([texto, numero]) => `<a href="tel:$
 
 let tipo = 'leve';
 let placaEditada = false;
+let extrasEditadas = false; // valor copiado do "+ Despesas" do site não volta ao padrão sozinho
 let temLance = false;
 const totaisNaTela = new Set(); // o total grande e o colado no lance que estão visíveis agora
 
@@ -33,7 +34,7 @@ function montar() {
 }
 
 function aplicarExtrasDoEdital() {
-  $('extras').value = valorNoCampo(extrasDoEdital($('comitente').value, $('uf').value, tipo));
+  if (!extrasEditadas) $('extras').value = valorNoCampo(extrasDoEdital($('comitente').value, $('uf').value, tipo));
 }
 
 function aplicarPlacaPadrao() {
@@ -64,10 +65,11 @@ function restaurar() {
   }
   for (const id of MARCAS) if (typeof salvo[id] === 'boolean') $(id).checked = salvo[id];
   placaEditada = salvo.placaEditada === true;
+  extrasEditadas = salvo.extrasEditadas === true;
 }
 
 function salvar() {
-  const dados = { tipo, comitente: $('comitente').value, uf: $('uf').value, placaEditada };
+  const dados = { tipo, comitente: $('comitente').value, uf: $('uf').value, placaEditada, extrasEditadas };
   for (const id of DINHEIRO) dados[id] = $(id).value;
   for (const id of MARCAS) dados[id] = $(id).checked;
   try { localStorage.setItem(CHAVE, JSON.stringify(dados)); } catch { /* aba anônima ou cota cheia: a conta segue, só não fica guardada */ }
@@ -90,10 +92,13 @@ function dicaExtras(c, veiculo) {
   return comoVer;
 }
 
+const dicaExtrasEditadas = ' O valor que você escreveu fica, mesmo trocando o vendedor.';
+
 function dicaDebitos(c) {
-  if (c.tetoDebitos === null) return 'Com este vendedor, todas as dívidas antigas são suas, sem limite. Escreva o valor que aparece no anúncio.';
-  if (c.tetoDebitos === 0) return 'Com este vendedor, as dívidas antigas ficam com ele. Você não paga.';
-  return `Não sabe? Deixe em branco: a conta usa ${reaisInteiros(c.tetoDebitos)}, o máximo que você paga com este vendedor. O que passar disso, ele paga.`;
+  let dica = `Não sabe? Deixe em branco: a conta usa ${reaisInteiros(c.tetoDebitos)}, o limite deste vendedor para dívidas antigas. O que passar disso, ele paga.`;
+  if (c.tetoDebitos === null) dica = 'Com este vendedor, todas as dívidas antigas são suas, sem limite. Escreva o valor que aparece no anúncio.';
+  if (c.tetoDebitos === 0) dica = 'Com este vendedor, as dívidas antigas ficam com ele.';
+  return c.excecaoDebitos ? `${dica} ${c.excecaoDebitos}` : dica;
 }
 
 const linhas = (lista) => lista.map((l) =>
@@ -133,7 +138,7 @@ function desenhar() {
   for (const id of SO_VEICULO) $(id).hidden = !r.veiculo;
   $('campo-uf').hidden = !(r.veiculo && c.atpv);
   $('campo-gravame').hidden = !(r.veiculo && c.gravamePR);
-  $('extras-dica').textContent = dicaExtras(c, r.veiculo);
+  $('extras-dica').textContent = dicaExtras(c, r.veiculo) + (extrasEditadas ? dicaExtrasEditadas : '');
   $('debitos-dica').textContent = dicaDebitos(c);
   const tituloGastos = r.veiculo ? 'Documentos e outros gastos' : 'Outros gastos';
   $('t-doc').textContent = tituloGastos;
@@ -195,6 +200,7 @@ function desenhar() {
     r.veiculo && 'Só aceitam reclamação de motor fundido ou câmbio travado, em veículo de 2017 para cima (menos os do Itaú), e antes de o veículo sair do pátio (item 14).',
     'Lance condicional (quando o vendedor ainda vai decidir se aceita o valor): espere até 5 dias úteis; se aceitarem, pague em 24 horas (itens 15 e 16).',
     'Primeira compra pela internet: só pode levar 1 lote, a não ser que o leiloeiro libere mais (item 130).',
+    !r.veiculo && 'Sucata com baixa definitiva no Detran só pode ser comprada por empresa cadastrada no Detran (itens 23 e 126).',
   ].filter(Boolean).map((t) => `<li>${t}</li>`).join('');
 
   $('lance-total-linha').hidden = !temLance;
@@ -207,6 +213,7 @@ function desenhar() {
 document.addEventListener('input', (ev) => {
   if (!DINHEIRO.includes(ev.target.id)) return;
   if (ev.target.id === 'placa') placaEditada = true;
+  if (ev.target.id === 'extras') extrasEditadas = true;
   desenhar();
 });
 
@@ -247,6 +254,7 @@ $('novo-lote').addEventListener('click', () => {
   $('gravame').checked = false;
   $('empilhadeira').checked = false;
   placaEditada = false;
+  extrasEditadas = false;
   aplicarExtrasDoEdital();
   aplicarPlacaPadrao();
   desenhar();

@@ -46,7 +46,7 @@ const SINISTRO = [
 
 // O "comitente" do edital é quem está vendendo.
 // tetoDebitos: até quanto das dívidas anteriores ao leilão fica com quem compra.
-// null = sem limite (todas são de quem compra); 0 = quem vende paga.
+// null = sem limite (todas são de quem compra); 0 = quem vende paga. excecaoDebitos: o que fica fora do limite.
 export const COMITENTES = [
   {
     id: 'itau',
@@ -62,7 +62,7 @@ export const COMITENTES = [
   },
   {
     id: 'itau-seguros',
-    nome: 'Itaú Seguros (veículo batido)',
+    nome: 'Itaú Seguros (batido)',
     tetoDebitos: null,
     regras: [
       'Todas as dívidas antigas (multas e IPVA) são suas, sem limite, mesmo as que não aparecem no anúncio (item 121). Escreva o valor das dívidas.',
@@ -93,6 +93,7 @@ export const COMITENTES = [
     id: 'safra',
     nome: 'Banco Safra ou J. Safra',
     tetoDebitos: 800,
+    excecaoDebitos: 'O limite do Safra vale para multas. IPVA atrasado não entra nele: some em "Outros gastos" (item 56).',
     atpvFixo: 50,
     regras: [
       'Multas antigas: você paga até R$ 800. Acima disso o banco paga a diferença, se você pedir em até 90 dias (item 56).',
@@ -104,9 +105,10 @@ export const COMITENTES = [
     id: 'previsul',
     nome: 'Previsul',
     tetoDebitos: 0,
+    excecaoDebitos: 'Mas IPVA e seguro obrigatório de 2026 e o licenciamento são seus: some em "Outros gastos" (item 59).',
     regras: [
       'Dívidas antigas do veículo: não pague. Mande para o leiloeiro em até 60 dias. Se pagar por conta própria, não recebe de volta (item 60).',
-      'IPVA e seguro obrigatório de 2026, licenciamento e multa por atraso na transferência são seus: some em "Outros gastos" (itens 59 e 60).',
+      'IPVA e seguro obrigatório de 2026 e o licenciamento são seus: some em "Outros gastos". A multa por atraso na transferência também é sua, e já entra na conta (itens 59 e 60).',
       'Vistorias, laudos e liberação de bloqueios são por sua conta. Transfira em até 30 dias e reconheça firma no termo que o leiloeiro entrega (itens 63, 66 e 67).',
       'O edital prevê remoção: moto R$ 150, carro R$ 350, caminhão R$ 800. Só conta se aparecer no "+ Despesas" do lote (item 64).',
     ],
@@ -123,6 +125,7 @@ export const COMITENTES = [
     id: 'itapeva',
     nome: 'Itapeva ou RCB',
     tetoDebitos: 800,
+    excecaoDebitos: 'Se o documento é de até 31/12/2025, IPVA, seguro obrigatório e licenciamento de 2026 não entram nesse limite: some em "Outros gastos" (item 74).',
     regras: [
       'Dívidas antigas: você paga até R$ 800; o resto é com o vendedor (item 73).',
       'Se o documento foi emitido até 31/12/2025, o IPVA, o seguro obrigatório e o licenciamento de 2026 são seus: some em "Outros gastos" (item 74).',
@@ -130,7 +133,7 @@ export const COMITENTES = [
   },
   {
     id: 'seguradora',
-    nome: 'Outra seguradora (veículo batido)',
+    nome: 'Seguradora (batido)',
     tetoDebitos: 1000,
     regras: [
       'Dívidas antigas: você paga até R$ 1.000. O que passar disso é devolvido com comprovante, se você pedir em até 120 dias (itens 124 a 126).',
@@ -139,11 +142,12 @@ export const COMITENTES = [
   },
   {
     id: 'demais',
-    nome: 'Outro vendedor (não está na lista)',
+    nome: 'Outro vendedor',
     tetoDebitos: 1000,
+    excecaoDebitos: 'IPVA e licenciamento de 2024 e 2025 atrasados não entram nesse limite: some em "Outros gastos" (item 75).',
     regras: [
       'Dívidas antigas: você paga até R$ 1.000. O que passar disso é devolvido depois de análise, se você pedir em até 120 dias (item 78).',
-      'IPVA e licenciamento de 2024 e 2025 ficam com você (item 75).',
+      'IPVA e licenciamento de 2024 e 2025 atrasados ficam com você, sem limite: some em "Outros gastos" (item 75).',
       'Remoção ou outra despesa do lote aparece no "+ Despesas" do site (item 76).',
     ],
   },

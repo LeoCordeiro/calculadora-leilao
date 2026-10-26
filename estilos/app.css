@@ -19,31 +19,32 @@ body { margin: 0; background: var(--bg); }
 .cab__sub { margin-top: 2px; font-size: var(--text-label); color: var(--muted); }
 .cab__acao { margin-left: auto; flex: none; }
 
-/* ---------- grade: no celular empilha lance, resultado, documentação, limite e regras;
-   de 1024 em diante o resultado fica fixo na coluna da direita ---------- */
-.grade { display: flex; flex-direction: column; gap: var(--space-5); }
-.coluna { display: contents; }
-.bloco--lance { order: 1; }
-.bloco--resultado { order: 2; }
-.bloco--doc { order: 3; }
-.bloco--limite { order: 4; }
-.bloco--regras { order: 5; }
+/* ---------- grade: o HTML já vem na ordem do celular e do Tab (lance, resultado, limite, gastos);
+   de 1024 em diante a grade põe cada bloco na sua coluna e o resultado fica fixo à direita ---------- */
+.grade, .coluna-gastos { display: flex; flex-direction: column; gap: var(--space-5); }
 
 @media (min-width: 1024px) {
-  .grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 420px); grid-template-rows: auto 1fr; gap: var(--space-5); }
-  .coluna { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
-  .coluna--a { grid-column: 1; grid-row: 1; }
-  .coluna--b { grid-column: 1; grid-row: 2; }
-  .coluna--c { grid-column: 2; grid-row: 1 / span 2; }
+  .grade {
+    display: grid; gap: var(--space-5); align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas: "lance resultado" "limite resultado" "gastos resultado";
+  }
+  .bloco--lance { grid-area: lance; }
+  .bloco--limite { grid-area: limite; }
+  .coluna-gastos { grid-area: gastos; min-width: 0; }
+  .coluna-resultado { grid-area: resultado; align-self: stretch; min-width: 0; }
   .bloco--resultado {
     position: sticky; top: var(--space-5);
     max-height: calc(100dvh - 2 * var(--space-5)); overflow-y: auto; overscroll-behavior: contain;
   }
 }
 @media (min-width: 1280px) {
-  .grade { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(380px, 440px); grid-template-rows: auto; }
-  .coluna--b { grid-column: 2; grid-row: 1; }
-  .coluna--c { grid-column: 3; grid-row: 1; }
+  .grade {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(380px, 440px);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "lance gastos resultado" "limite gastos resultado";
+  }
 }
 
 /* ---------- campos ---------- */
@@ -54,6 +55,9 @@ body { margin: 0; background: var(--bg); }
   color: var(--muted); font-weight: var(--weight-semibold); pointer-events: none;
 }
 .campo-dinheiro .na-input { width: 100%; padding-left: 44px; font-variant-numeric: tabular-nums; }
+/* a borda do DS (--border) dá 1,2:1; campo branco em cartão branco precisa de 3:1 para aparecer */
+.campo-dinheiro .na-input:not(:focus):not([aria-invalid="true"]), .na-select .na-input:not(:focus) { border-color: var(--muted); }
+.campos-lado { align-items: start; } /* campos lado a lado com dicas de tamanho diferente não descem */
 .campo-dinheiro--grande .na-input { height: 64px; padding-left: 58px; font-size: 1.75rem; font-weight: var(--weight-bold); }
 .campo-dinheiro--grande .campo-dinheiro__prefixo { left: 18px; font-size: var(--text-heading-sm); }
 
@@ -117,7 +121,7 @@ body { margin: 0; background: var(--bg); }
 /* ---------- regras ---------- */
 .regras__titulo { margin: var(--space-4) 0 var(--space-2); font-size: var(--text-label); font-weight: var(--weight-bold); color: var(--fg); }
 .regras { display: grid; gap: var(--space-2); margin: 0; padding-left: 1.15em; font-size: var(--text-label); color: var(--fg-2); }
-.regras a { display: inline-block; padding-block: var(--space-1); color: var(--accent-text); font-weight: var(--weight-semibold); white-space: nowrap; }
+.regras a { color: var(--accent-text); font-weight: var(--weight-semibold); white-space: nowrap; }
 
 .link { color: var(--accent-text); font-weight: var(--weight-semibold); }
 
@@ -129,6 +133,9 @@ body { margin: 0; background: var(--bg); }
 .barra-total__valor { font-size: var(--text-heading-sm); font-variant-numeric: tabular-nums; }
 
 @media (max-width: 1023px) {
+  html { scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom)); } /* o Tab não deixa campo atrás da barra */
+  .incrementos .na-btn, .cab__acao { min-height: 44px; }
+  .regras a, .link { padding-block: 14px; } /* alvo de toque de ~44 px sem mexer na linha do texto */
   .pagina { padding: var(--space-4) var(--space-4) calc(88px + env(safe-area-inset-bottom)); }
   .barra-total {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; align-items: center; justify-content: space-between;
@@ -142,4 +149,5 @@ body { margin: 0; background: var(--bg); }
   .cab__marca { display: none; }
   .cab__titulo { font-size: var(--text-heading-sm); }
   .cab__sub { font-size: var(--text-caption); }
+  .bloco { padding-inline: var(--space-4); } /* mais largura útil para campo e seletor em 320–480 */
 }

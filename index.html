@@ -34,7 +34,7 @@
     </header>
 
     <main class="grade">
-      <div class="coluna coluna--a">
+      <!-- a ordem do HTML é a do celular (e a do Tab); no PC a grade põe cada bloco na sua coluna -->
         <section class="na-card bloco bloco--lance" aria-labelledby="t-lance">
           <h2 class="na-card__title" id="t-lance">Seu lance</h2>
           <div class="campos">
@@ -97,7 +97,32 @@
             </div>
           </div>
         </section>
-
+        <div class="coluna-resultado">
+          <section class="na-card bloco bloco--resultado" id="resultado" aria-labelledby="t-resultado">
+            <h2 class="resultado__rotulo" id="t-resultado">Total para ter o veículo no seu nome</h2>
+            <p class="resultado__total is-vazio" id="total" aria-live="polite" aria-atomic="true">—</p>
+            <p class="resultado__acrescimo" id="acrescimo"></p>
+            <p class="na-texto-dica resultado__formula" id="formula"></p>
+            <div id="avisos"></div>
+            <div id="detalhe" hidden>
+              <div class="resultado__partes">
+                <div class="parte">
+                  <span class="parte__rotulo">Pago ao leilão (até 1 dia útil depois)</span>
+                  <strong class="parte__valor" id="sub-leilao"></strong>
+                </div>
+                <div class="parte">
+                  <span class="parte__rotulo" id="sub-doc-rotulo">Documentos e gastos (estimativa)</span>
+                  <strong class="parte__valor" id="sub-doc"></strong>
+                </div>
+              </div>
+              <h3 class="linhas__titulo">Pago ao leilão</h3>
+              <dl class="linhas" id="linhas-leilao"></dl>
+              <h3 class="linhas__titulo" id="linhas-doc-titulo">Documentos e outros gastos</h3>
+              <dl class="linhas" id="linhas-doc"></dl>
+              <p class="na-texto-dica resultado__caucao" id="caucao"></p>
+            </div>
+          </section>
+        </div>
         <section class="na-card bloco bloco--limite" aria-labelledby="t-limite">
           <h2 class="na-card__title" id="t-limite">Até quanto posso dar de lance?</h2>
           <div class="campos">
@@ -124,109 +149,79 @@
             <p class="destaque" id="fipe-resultado" aria-live="polite"></p>
           </div>
         </section>
-      </div>
-
-      <div class="coluna coluna--b">
-        <section class="na-card bloco bloco--doc" aria-labelledby="t-doc">
-          <h2 class="na-card__title" id="t-doc">Documentos e outros gastos</h2>
-          <p class="na-card__meta">São estimativas. Se souber o valor certo, troque.</p>
-          <div class="campos">
-            <div class="na-field" id="campo-debitos">
-              <label class="na-field__label" for="debitos">Dívidas do veículo (IPVA, multas)</label>
-              <div class="campo-dinheiro">
-                <span class="campo-dinheiro__prefixo" aria-hidden="true">R$</span>
-                <input class="na-input" id="debitos" inputmode="decimal" autocomplete="off" placeholder="não sei" aria-describedby="debitos-dica debitos-erro">
-              </div>
-              <span class="na-field__hint" id="debitos-dica"></span>
-              <span class="na-field__error" id="debitos-erro" hidden></span>
-            </div>
-
-            <div class="na-field" id="campo-despachante">
-              <label class="na-field__label" for="despachante">Passar o veículo para o seu nome</label>
-              <div class="campo-dinheiro">
-                <span class="campo-dinheiro__prefixo" aria-hidden="true">R$</span>
-                <input class="na-input" id="despachante" inputmode="decimal" autocomplete="off" aria-describedby="despachante-dica despachante-erro">
-              </div>
-              <span class="na-field__hint" id="despachante-dica">Tem que ser pelo despachante do leilão, a Mezzalira. Ligue antes e pergunte o preço: <a class="link" href="tel:+551150347473">(11) 5034-7473</a>. Deixamos R$ 900 como estimativa.</span>
-              <span class="na-field__error" id="despachante-erro" hidden></span>
-            </div>
-
-            <div class="na-field" id="campo-placa">
-              <label class="na-field__label" for="placa">Placa nova (modelo Mercosul)</label>
-              <div class="campo-dinheiro">
-                <span class="campo-dinheiro__prefixo" aria-hidden="true">R$</span>
-                <input class="na-input" id="placa" inputmode="decimal" autocomplete="off" aria-describedby="placa-dica placa-erro">
-              </div>
-              <span class="na-field__hint" id="placa-dica">Se o veículo ainda tem a placa antiga, cinza, a troca é sua. Se já tem a placa nova, ponha 0.</span>
-              <span class="na-field__error" id="placa-erro" hidden></span>
-            </div>
-
-            <div class="na-field" id="campo-averbacao">
-              <label class="na-check check-alto"><input type="checkbox" id="averbacao" aria-describedby="averbacao-dica"> Multa por atraso na transferência (R$ 195,23)</label>
-              <span class="na-field__hint" id="averbacao-dica">Quase certa: os documentos podem levar mais de 2 meses para chegar, e o Detran multa quem não passa o veículo para o próprio nome em 30 dias. Se o anúncio promete o documento rápido (ex.: "entrega em 20 dias"), dá para evitar: desmarque.</span>
-            </div>
-
-            <div class="na-campos">
-              <div class="na-field">
-                <label class="na-field__label" for="guincho">Guincho até sua casa</label>
+        <div class="coluna-gastos">
+          <section class="na-card bloco bloco--doc" aria-labelledby="t-doc">
+            <h2 class="na-card__title" id="t-doc">Documentos e outros gastos</h2>
+            <p class="na-card__meta">São estimativas. Se souber o valor certo, troque.</p>
+            <div class="campos">
+              <div class="na-field" id="campo-debitos">
+                <label class="na-field__label" for="debitos">Dívidas do veículo (IPVA, multas)</label>
                 <div class="campo-dinheiro">
                   <span class="campo-dinheiro__prefixo" aria-hidden="true">R$</span>
-                  <input class="na-input" id="guincho" inputmode="decimal" autocomplete="off" aria-describedby="guincho-dica guincho-erro">
+                  <input class="na-input" id="debitos" inputmode="decimal" autocomplete="off" placeholder="não sei" aria-describedby="debitos-dica debitos-erro">
                 </div>
-                <span class="na-field__hint" id="guincho-dica">Muitos veículos de leilão não podem rodar até ser regularizados.</span>
-                <span class="na-field__error" id="guincho-erro" hidden></span>
+                <span class="na-field__hint" id="debitos-dica"></span>
+                <span class="na-field__error" id="debitos-erro" hidden></span>
               </div>
-              <div class="na-field">
-                <label class="na-field__label" for="outros">Outros gastos</label>
+
+              <div class="na-field" id="campo-despachante">
+                <label class="na-field__label" for="despachante">Passar o veículo para o seu nome</label>
                 <div class="campo-dinheiro">
                   <span class="campo-dinheiro__prefixo" aria-hidden="true">R$</span>
-                  <input class="na-input" id="outros" inputmode="decimal" autocomplete="off" aria-describedby="outros-dica outros-erro">
+                  <input class="na-input" id="despachante" inputmode="decimal" autocomplete="off" aria-describedby="despachante-dica despachante-erro">
                 </div>
-                <span class="na-field__hint" id="outros-dica">IPVA deste ano, conserto, vistoria.</span>
-                <span class="na-field__error" id="outros-erro" hidden></span>
+                <span class="na-field__hint" id="despachante-dica">Tem que ser pelo despachante do leilão, a Mezzalira. Ligue antes e pergunte o preço: <a class="link" href="tel:+551150347473">(11) 5034-7473</a>. Deixamos R$ 900 como estimativa.</span>
+                <span class="na-field__error" id="despachante-erro" hidden></span>
+              </div>
+
+              <div class="na-field" id="campo-placa">
+                <label class="na-field__label" for="placa">Placa nova (modelo Mercosul)</label>
+                <div class="campo-dinheiro">
+                  <span class="campo-dinheiro__prefixo" aria-hidden="true">R$</span>
+                  <input class="na-input" id="placa" inputmode="decimal" autocomplete="off" aria-describedby="placa-dica placa-erro">
+                </div>
+                <span class="na-field__hint" id="placa-dica">Se o veículo ainda tem a placa antiga, cinza, a troca é sua. Se já tem a placa nova, ponha 0.</span>
+                <span class="na-field__error" id="placa-erro" hidden></span>
+              </div>
+
+              <div class="na-field" id="campo-averbacao">
+                <label class="na-check check-alto"><input type="checkbox" id="averbacao" aria-describedby="averbacao-dica"> Multa por atraso na transferência (R$ 195,23)</label>
+                <span class="na-field__hint" id="averbacao-dica">Quase certa: os documentos podem levar mais de 2 meses para chegar, e o Detran multa quem não passa o veículo para o próprio nome em 30 dias. Se o anúncio promete o documento rápido (ex.: "entrega em 20 dias"), dá para evitar: desmarque.</span>
+              </div>
+
+              <div class="na-campos campos-lado">
+                <div class="na-field">
+                  <label class="na-field__label" for="guincho">Guincho até sua casa</label>
+                  <div class="campo-dinheiro">
+                    <span class="campo-dinheiro__prefixo" aria-hidden="true">R$</span>
+                    <input class="na-input" id="guincho" inputmode="decimal" autocomplete="off" aria-describedby="guincho-dica guincho-erro">
+                  </div>
+                  <span class="na-field__hint" id="guincho-dica">Veículo com documento de São Paulo sai com "circulação proibida" até ser regularizado (item 68): conte com guincho.</span>
+                  <span class="na-field__error" id="guincho-erro" hidden></span>
+                </div>
+                <div class="na-field">
+                  <label class="na-field__label" for="outros">Outros gastos</label>
+                  <div class="campo-dinheiro">
+                    <span class="campo-dinheiro__prefixo" aria-hidden="true">R$</span>
+                    <input class="na-input" id="outros" inputmode="decimal" autocomplete="off" aria-describedby="outros-dica outros-erro">
+                  </div>
+                  <span class="na-field__hint" id="outros-dica">IPVA deste ano, conserto, vistoria.</span>
+                  <span class="na-field__error" id="outros-erro" hidden></span>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        <section class="na-card bloco bloco--regras" aria-labelledby="t-regras">
-          <h2 class="na-card__title" id="t-regras">Regras importantes do leilão</h2>
-          <p class="na-card__meta">O número entre parênteses é o item do edital (o regulamento do leilão), se quiser conferir.</p>
-          <div id="regras-comitente-bloco">
-            <h3 class="regras__titulo" id="regras-comitente-titulo"></h3>
-            <ul class="regras" id="regras-comitente"></ul>
-          </div>
-          <h3 class="regras__titulo">Valem para qualquer lote</h3>
-          <ul class="regras" id="regras-gerais"></ul>
-        </section>
-      </div>
-
-      <div class="coluna coluna--c">
-        <section class="na-card bloco bloco--resultado" id="resultado" aria-labelledby="t-resultado">
-          <h2 class="resultado__rotulo" id="t-resultado">Total para ter o veículo no seu nome</h2>
-          <p class="resultado__total is-vazio" id="total" aria-live="polite" aria-atomic="true">—</p>
-          <p class="resultado__acrescimo" id="acrescimo"></p>
-          <p class="na-texto-dica resultado__formula" id="formula"></p>
-          <div id="avisos"></div>
-          <div id="detalhe" hidden>
-            <div class="resultado__partes">
-              <div class="parte">
-                <span class="parte__rotulo">Pago ao leilão (até 1 dia útil depois)</span>
-                <strong class="parte__valor" id="sub-leilao"></strong>
-              </div>
-              <div class="parte">
-                <span class="parte__rotulo" id="sub-doc-rotulo">Documentos e gastos (estimativa)</span>
-                <strong class="parte__valor" id="sub-doc"></strong>
-              </div>
+          </section>
+          <section class="na-card bloco bloco--regras" aria-labelledby="t-regras">
+            <h2 class="na-card__title" id="t-regras">Regras importantes do leilão</h2>
+            <p class="na-card__meta">O número entre parênteses é o item do edital (o regulamento do leilão), se quiser conferir.</p>
+            <div id="regras-comitente-bloco">
+              <h3 class="regras__titulo" id="regras-comitente-titulo"></h3>
+              <ul class="regras" id="regras-comitente"></ul>
             </div>
-            <h3 class="linhas__titulo">Pago ao leilão</h3>
-            <dl class="linhas" id="linhas-leilao"></dl>
-            <h3 class="linhas__titulo" id="linhas-doc-titulo">Documentos e outros gastos</h3>
-            <dl class="linhas" id="linhas-doc"></dl>
-            <p class="na-texto-dica resultado__caucao" id="caucao"></p>
-          </div>
-        </section>
-      </div>
+            <h3 class="regras__titulo">Valem para qualquer lote</h3>
+            <ul class="regras" id="regras-gerais"></ul>
+          </section>
+        </div>
     </main>
 
     <footer class="rodape">

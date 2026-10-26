@@ -8,7 +8,8 @@ const PORCENTO = new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFract
 
 /** Vazio = null; inválido = undefined; senão reais. Aceita 15000, 15.000, 15.000,50, 39,90 e 39.90. */
 export function lerValor(texto) {
-  const s = String(texto ?? '').replace(/R\$|\s/g, '');
+  // separador no fim ("15000,", "1.") é digitação pela metade, não erro
+  const s = String(texto ?? '').replace(/R\$|\s/g, '').replace(/[.,]$/, '');
   if (!s) return null;
   if (/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(s) || /^\d+(,\d{1,2})?$/.test(s)) {
     return Number(s.replace(/\./g, '').replace(',', '.'));
