@@ -34,11 +34,11 @@ export function taxaMateriais(lance) {
 export const remocaoDoEdital = (comitenteId, tipo) => comitentePorId(comitenteId).remocao?.[tipo] ?? null;
 
 function notaDebitos(d) {
-  if (d.semTeto) return d.informado === null ? 'sem teto neste comitente: informe o valor' : 'sem teto: todos são seus';
-  if (d.teto === 0) return 'ficam com o comitente';
-  if (d.informado === null) return `pior caso: o teto de ${reais(d.teto)}`;
-  if (d.comitente > 0) return `teto de ${reais(d.teto)}; o comitente paga ${reais(d.comitente)}`;
-  return 'valor informado';
+  if (d.semTeto) return d.informado === null ? 'sem limite com este vendedor: escreva o valor' : 'todas são suas';
+  if (d.teto === 0) return 'ficam com quem está vendendo';
+  if (d.informado === null) return `você não informou: conta o máximo, ${reais(d.teto)}`;
+  if (d.comitente > 0) return `você paga até ${reais(d.teto)}; o vendedor paga ${reais(d.comitente)}`;
+  return 'valor que você informou';
 }
 
 export function calcular(entrada) {
@@ -51,28 +51,28 @@ export function calcular(entrada) {
   const lance = cent(e.lance);
   const comissao = Math.round(lance * COMISSAO);
   const leilao = [
-    { id: 'lance', rotulo: 'Lance', valor: lance },
-    { id: 'comissao', rotulo: 'Comissão do leiloeiro (5%)', valor: comissao, nota: 'item 80' },
+    { id: 'lance', rotulo: 'Seu lance', valor: lance },
+    { id: 'comissao', rotulo: 'Comissão do leiloeiro', valor: comissao, nota: '5% do lance' },
   ];
   const doc = [];
   const debitos = { informado: null, teto: null, seu: 0, comitente: 0, semTeto: false };
 
   if (!veiculo) {
-    leilao.push({ id: 'adm', rotulo: 'Despesas administrativas', valor: cent(taxaMateriais(e.lance ?? 0)), nota: 'tabela de materiais, item 83' });
+    leilao.push({ id: 'adm', rotulo: 'Taxa do leilão', valor: cent(taxaMateriais(e.lance ?? 0)), nota: 'muda conforme o valor do lance' });
   } else {
-    leilao.push({ id: 'adm', rotulo: 'Despesas administrativas', valor: cent(TIPOS[tipo].adm), nota: `${TIPOS[tipo].nome.toLowerCase()}, item 83` });
+    leilao.push({ id: 'adm', rotulo: 'Taxa do leilão', valor: cent(TIPOS[tipo].adm), nota: 'valor fixo por veículo ("despesas administrativas")' });
 
     const remocao = e.remocao ?? remocaoDoEdital(c.id, tipo) ?? 0;
-    if (remocao > 0) leilao.push({ id: 'remocao', rotulo: 'Remoção', valor: cent(remocao), nota: c.itemRemocao ? `item ${c.itemRemocao}` : 'informada no lote' });
+    if (remocao > 0) leilao.push({ id: 'remocao', rotulo: 'Taxa de remoção', valor: cent(remocao), nota: 'guincho que levou o veículo até o pátio' });
 
     if (c.atpv) {
       const uf = c.atpv[e.uf] === undefined ? 'outra' : e.uf;
-      leilao.push({ id: 'atpv', rotulo: 'ATPV‑e', valor: cent(c.atpv[uf]), nota: `${uf === 'outra' ? 'outro estado' : uf}, item 45` });
+      leilao.push({ id: 'atpv', rotulo: 'Documento de venda (ATPV‑e)', valor: cent(c.atpv[uf]), nota: `veículo registrado em ${uf === 'outra' ? 'outro estado' : uf}` });
     } else if (c.atpvFixo) {
-      leilao.push({ id: 'atpv', rotulo: 'ATPV‑e', valor: cent(c.atpvFixo), nota: 'item 55' });
+      leilao.push({ id: 'atpv', rotulo: 'Documento de venda (ATPV‑e)', valor: cent(c.atpvFixo), nota: 'valor fixo deste vendedor' });
     }
 
-    if (e.empilhadeira) leilao.push({ id: 'empilhadeira', rotulo: 'Empilhadeira', valor: cent(EMPILHADEIRA), nota: 'item 8' });
+    if (e.empilhadeira) leilao.push({ id: 'empilhadeira', rotulo: 'Empilhadeira', valor: cent(EMPILHADEIRA), nota: 'para tirar o veículo do lugar' });
 
     debitos.semTeto = c.tetoDebitos === null;
     debitos.teto = debitos.semTeto ? null : cent(c.tetoDebitos);
@@ -83,17 +83,17 @@ export function calcular(entrada) {
       debitos.seu = debitos.semTeto ? debitos.informado : Math.min(debitos.informado, debitos.teto);
       debitos.comitente = debitos.informado - debitos.seu;
     }
-    doc.push({ id: 'debitos', rotulo: 'Débitos do veículo', valor: debitos.seu, nota: notaDebitos(debitos) });
+    doc.push({ id: 'debitos', rotulo: 'Dívidas do veículo', valor: debitos.seu, nota: notaDebitos(debitos) });
 
-    if (c.gravamePR && e.gravamePR) doc.push({ id: 'gravame', rotulo: 'Gravame no Paraná', valor: cent(c.gravamePR), nota: 'item 32' });
-    if (e.despachante > 0) doc.push({ id: 'despachante', rotulo: 'Transferência pelo despachante', valor: cent(e.despachante), nota: 'estimativa; cote com a Mezzalira' });
+    if (c.gravamePR && e.gravamePR) doc.push({ id: 'gravame', rotulo: 'Tirar o financiamento do documento', valor: cent(c.gravamePR), nota: 'só no Paraná' });
+    if (e.despachante > 0) doc.push({ id: 'despachante', rotulo: 'Passar para o seu nome', valor: cent(e.despachante), nota: 'estimativa: pergunte o preço ao despachante' });
     const placa = e.placa ?? ESTIMATIVAS.placa[tipo];
-    if (placa > 0) doc.push({ id: 'placa', rotulo: 'Placa Mercosul', valor: cent(placa), nota: 'estimativa, item 5' });
-    if (e.averbacao) doc.push({ id: 'averbacao', rotulo: 'Multa de averbação', valor: cent(ESTIMATIVAS.multaAverbacao), nota: 'provável, item 6' });
+    if (placa > 0) doc.push({ id: 'placa', rotulo: 'Placa nova (Mercosul)', valor: cent(placa), nota: 'estimativa' });
+    if (e.averbacao) doc.push({ id: 'averbacao', rotulo: 'Multa por atraso na transferência', valor: cent(ESTIMATIVAS.multaAverbacao), nota: 'quase certa' });
   }
 
-  if (e.guincho > 0) doc.push({ id: 'guincho', rotulo: 'Guincho ou transporte', valor: cent(e.guincho) });
-  if (e.outros > 0) doc.push({ id: 'outros', rotulo: 'Outros custos', valor: cent(e.outros) });
+  if (e.guincho > 0) doc.push({ id: 'guincho', rotulo: 'Guincho até sua casa', valor: cent(e.guincho) });
+  if (e.outros > 0) doc.push({ id: 'outros', rotulo: 'Outros gastos', valor: cent(e.outros) });
 
   const totalLeilao = soma(leilao);
   const totalDoc = soma(doc);

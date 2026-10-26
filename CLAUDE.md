@@ -1,4 +1,4 @@
-# Calculadora de arremate — quanto custa de verdade um lance no leilão do Ronaldo Milan (veículos e materiais), para o Leonardo usar no celular durante o leilão.
+# Calculadora do leilão — quanto custa de verdade um lance no leilão do Ronaldo Milan (veículos e materiais), para o Leonardo usar no celular durante o leilão.
 
 ## Mapa
 - Stack: HTML + CSS + JS puro (módulos ES), sem build · Rodar: preview `calculadora-leilao` (porta 5800, `python -m http.server`, no launch.json do cofre) · Testes: `npm test` (node:test) · Deploy: site estático, só com ordem dele.
@@ -9,6 +9,7 @@
 
 ## Regras e armadilhas
 - Edital novo: mudar `regras.js` e `teste/calculo.test.js` juntos; todo valor cita o item.
+- Textos da tela para leigo (pedido dele, 26/10): sem jargão ou com o jargão explicado ("Quem está vendendo" = comitente; "Taxa do leilão" = despesas administrativas; "Dívidas" = débitos). Item do edital só nas regras, entre parênteses.
 - Leituras do edital: ATPV-e por UF (item 45) só para o Pan (está na seção dele); a tabela de taxa é de MATERIAIS (vem logo após "MATERIAIS: arrematação"); débitos vazios = pior caso (o teto do comitente); "Demais comitentes" tem teto de R$ 1.000, mas o item 75 diz que IPVA e licenciamento 2024/2025 são do comprador (a tela avisa).
 - Remoção é preenchida pelo edital a cada troca de comitente ou tipo (sobrescreve o que a pessoa digitou); placa só enquanto ela não editou.
 - `[hidden]` precisa de `display: none !important`: o DS põe `display` em `.na-field` e `.na-check`.

@@ -1,5 +1,6 @@
 // Condições de venda de outubro/2026 — Ronaldo Milan, leiloeiro oficial.
 // Cada valor cita o item do edital. Edital novo: mudar aqui e em teste/calculo.test.js.
+// Os textos que aparecem na tela são para quem nunca foi a leilão: sem jargão, ou com o jargão explicado.
 
 export const EDITAL = 'Condições de venda de outubro/2026';
 
@@ -13,7 +14,7 @@ export const TIPOS = {
   moto: { nome: 'Moto', adm: 450, diaria: 20 },
   leve: { nome: 'Carro ou picape leve', adm: 2350, diaria: 50 },
   pesado: { nome: 'Caminhão, ônibus ou van', adm: 5000, diaria: 80 },
-  material: { nome: 'Material', adm: null, diaria: 30 },
+  material: { nome: 'Outros bens', descricao: 'peças, sucata, máquinas', adm: null, diaria: 30 }, // "materiais" no edital
 };
 
 // "MATERIAIS: arrematação:" (item 83) → tabela de taxa: [valor inicial do lance, taxa].
@@ -36,35 +37,37 @@ export const DESPACHANTE = {
   telefones: [['(11) 5034-7473', '+551150347473'], ['(11) 5034-6929', '+551150346929'], ['(11) 95049-1318', '+5511950491318']],
 };
 
+// Veículo batido, vendido por seguradora.
 const SINISTRO = [
-  'Circulação vedada até regularizar: conte com guincho (itens 111 e 133).',
-  'Para voltar a rodar: vistoria, laudos e inspeção de segurança veicular (CSV) por sua conta (itens 109 e 115).',
-  'Pagou depois do prazo do catálogo: a taxa de depósito dobra (item 99).',
+  'Veículo batido costuma vir com "circulação proibida" no documento: não pode rodar até regularizar. Conte com guincho (itens 111 e 133).',
+  'Para voltar a rodar: vistoria, laudos e inspeção de segurança por sua conta (itens 109 e 115).',
+  'Se pagar depois do prazo do anúncio, a taxa de pátio dobra (item 99).',
 ];
 
-// tetoDebitos: até quanto dos débitos anteriores ao leilão fica com o arrematante.
-// null = sem teto (todos são dele); 0 = o comitente paga.
+// O "comitente" do edital é quem está vendendo.
+// tetoDebitos: até quanto das dívidas anteriores ao leilão fica com quem compra.
+// null = sem limite (todas são de quem compra); 0 = quem vende paga.
 export const COMITENTES = [
   {
     id: 'itau',
-    nome: 'Itaú Unibanco',
+    nome: 'Banco Itaú',
     remocao: { moto: 200, leve: 400, pesado: 800 },
     itemRemocao: 36,
     tetoDebitos: 500,
     gravamePR: 37.5,
     regras: [
-      'Débitos até R$ 500 são seus; o excedente o banco reembolsa se você reclamar em até 120 dias (itens 33 a 35).',
-      'O Itaú passa o veículo para o nome do banco em SP. Regularizar em outro estado fica por sua conta (item 31).',
-      'Transferência no Paraná com alienação no CRV: taxa de gravame de R$ 37,50 (item 32).',
+      'Dívidas antigas do veículo (IPVA, multas): você paga até R$ 500. O que passar disso o banco devolve, se você pedir em até 120 dias (itens 33 a 35).',
+      'O Itaú passa o veículo para o nome do banco em São Paulo. Se você mora em outro estado, os gastos para levar o documento para lá são seus (item 31).',
+      'Se for transferir no Paraná e o documento ainda mostrar o financiamento, paga mais R$ 37,50 (item 32).',
     ],
   },
   {
     id: 'itau-seguros',
-    nome: 'Itaú Unibanco Seguros (batido)',
+    nome: 'Itaú Seguros (veículo batido)',
     remocao: null,
     tetoDebitos: null,
     regras: [
-      'Multas e IPVA anteriores ao leilão são todos seus, mesmo fora do catálogo (item 121). Informe o valor dos débitos.',
+      'Todas as dívidas antigas (multas e IPVA) são suas, sem limite, mesmo as que não aparecem no anúncio (item 121). Escreva o valor das dívidas.',
       ...SINISTRO,
     ],
   },
@@ -75,9 +78,9 @@ export const COMITENTES = [
     tetoDebitos: 500,
     atpv: { SP: 123, SC: 153, RJ: 273, outra: 143 },
     regras: [
-      'Não pague débitos por conta própria: o Pan não reembolsa (item 37).',
-      'Débitos acima de R$ 500: avise o leiloeiro em até 30 dias. Você deposita R$ 500 na conta do despachante e o banco paga o resto (itens 38, 40 e 41).',
-      'ATPV‑e por sua conta: SP R$ 123, SC R$ 153, RJ R$ 273, demais estados R$ 143 (item 45).',
+      'Não pague nenhuma dívida do veículo por conta própria: o Banco Pan não devolve o dinheiro (item 37).',
+      'Se as dívidas passarem de R$ 500, avise o leiloeiro em até 30 dias. Você deposita R$ 500 para o despachante e o banco paga o resto (itens 38, 40 e 41).',
+      'O documento de venda (ATPV‑e) é por sua conta: SP R$ 123, SC R$ 153, RJ R$ 273, outros estados R$ 143 (item 45).',
     ],
   },
   {
@@ -86,21 +89,21 @@ export const COMITENTES = [
     remocao: null,
     tetoDebitos: 500,
     regras: [
-      'Débitos até R$ 500 são seus; o excedente é reembolsado após análise, se reclamado em até 90 dias corridos (itens 51 e 52).',
-      'Kit gás sem certificado ou GNV no documento: regularização por sua conta (item 50).',
+      'Dívidas antigas: você paga até R$ 500. O que passar disso o banco devolve depois de analisar, se você pedir em até 90 dias (itens 51 e 52).',
+      'Kit gás sem certificado, ou GNV escrito no documento sem o kit no carro: regularizar é por sua conta (item 50).',
     ],
   },
   {
     id: 'safra',
-    nome: 'Banco Safra / J. Safra',
+    nome: 'Banco Safra ou J. Safra',
     remocao: { moto: null, leve: 370, pesado: 1500 },
     itemRemocao: 54,
     tetoDebitos: 800,
     atpvFixo: 50,
     regras: [
-      'Multas anteriores até R$ 800 são suas; acima disso o banco paga a diferença, se pedida em até 90 dias (item 56).',
-      'ATPV‑e de R$ 50 (item 55). Remoção: leve R$ 370, pesado R$ 1.500 (item 54).',
-      'Pagamento só pelo próprio comprador, na conta Safra do leiloeiro informada no edital (item 85).',
+      'Multas antigas: você paga até R$ 800. Acima disso o banco paga a diferença, se você pedir em até 90 dias (item 56).',
+      'Documento de venda (ATPV‑e): R$ 50. Taxa de remoção: carro R$ 370, caminhão R$ 1.500 (itens 54 e 55).',
+      'O pagamento tem que sair da sua própria conta, para a conta do Safra que o leiloeiro informar (item 85).',
     ],
   },
   {
@@ -110,9 +113,9 @@ export const COMITENTES = [
     itemRemocao: 64,
     tetoDebitos: 0,
     regras: [
-      'Débitos anteriores ao leilão: não pague. Envie ao leiloeiro em até 60 dias; quem paga por conta própria não é reembolsado (item 60).',
-      'IPVA e DPVAT 2026, licenciamento e multas de averbação são seus (itens 59 e 60): some em "Outros custos".',
-      'Laudos, vistorias e baixa de restrição por sua conta (item 63). Transferir em até 30 dias e reconhecer firma do termo (itens 66 e 67).',
+      'Dívidas antigas do veículo: não pague. Mande para o leiloeiro em até 60 dias. Se pagar por conta própria, não recebe de volta (item 60).',
+      'IPVA e seguro obrigatório de 2026, licenciamento e multa por atraso na transferência são seus: some em "Outros gastos" (itens 59 e 60).',
+      'Vistorias, laudos e liberação de bloqueios são por sua conta. Transfira em até 30 dias e reconheça firma no termo que o leiloeiro entrega (itens 63, 66 e 67).',
     ],
   },
   {
@@ -121,38 +124,38 @@ export const COMITENTES = [
     remocao: null,
     tetoDebitos: 0,
     regras: [
-      'Multas e IPVA anteriores à venda ficam com o banco, após análise. Não pague antes de o banco se posicionar (item 72).',
+      'Multas e IPVA antigos ficam com o banco, depois de analisar. Não pague nada antes de o banco responder (item 72).',
     ],
   },
   {
     id: 'itapeva',
-    nome: 'Itapeva / RCB',
+    nome: 'Itapeva ou RCB',
     remocao: null,
     tetoDebitos: 800,
     regras: [
-      'Débitos anteriores até R$ 800 são seus; o restante é do comitente (item 73).',
-      'Documento emitido até 31/12/2025: IPVA, DPVAT e licenciamento 2026 são seus (item 74). Some em "Outros custos".',
+      'Dívidas antigas: você paga até R$ 800; o resto é com o vendedor (item 73).',
+      'Se o documento foi emitido até 31/12/2025, o IPVA, o seguro obrigatório e o licenciamento de 2026 são seus: some em "Outros gastos" (item 74).',
     ],
   },
   {
     id: 'seguradora',
-    nome: 'Seguradora (batido)',
+    nome: 'Outra seguradora (veículo batido)',
     remocao: null,
     tetoDebitos: 1000,
     regras: [
-      'Débitos até R$ 1.000 são seus; o excedente é reembolsado com comprovante, se reclamado em até 120 dias (itens 124 a 126).',
+      'Dívidas antigas: você paga até R$ 1.000. O que passar disso é devolvido com comprovante, se você pedir em até 120 dias (itens 124 a 126).',
       ...SINISTRO,
     ],
   },
   {
     id: 'demais',
-    nome: 'Demais comitentes',
+    nome: 'Outro vendedor (não está na lista)',
     remocao: null,
     tetoDebitos: 1000,
     regras: [
-      'Débitos até R$ 1.000 são seus; o excedente é reembolsado após análise, se reclamado em até 120 dias ("Demais comitentes" e item 78).',
-      'IPVA e licenciamento 2024/2025 ficam com o comprador (item 75).',
-      'Remoção, quando for sua, vem descrita no lote (item 76).',
+      'Dívidas antigas: você paga até R$ 1.000. O que passar disso é devolvido depois de análise, se você pedir em até 120 dias (item 78).',
+      'IPVA e licenciamento de 2024 e 2025 ficam com você (item 75).',
+      'Se tiver taxa de remoção, ela vem escrita no anúncio do lote (item 76).',
     ],
   },
 ];

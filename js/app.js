@@ -6,14 +6,14 @@ import { lerValor, porcento, reais, reaisInteiros, valorNoCampo } from './dinhei
 
 const $ = (id) => document.getElementById(id);
 const CHAVE = 'calculadora-leilao:v1';
-const ERRO_VALOR = 'Valor em reais, ex.: 39,90 ou 1.234,56.';
+const ERRO_VALOR = 'Use só números, como 15000 ou 1.234,56.';
 const DINHEIRO = ['lance', 'remocao', 'debitos', 'despachante', 'placa', 'guincho', 'outros', 'orcamento', 'fipe'];
 const MARCAS = ['gravame', 'empilhadeira', 'averbacao'];
 const UFS = ['SP', 'SC', 'RJ', 'outra'];
 const SO_VEICULO = ['campo-comitente', 'campo-remocao', 'campo-marcas', 'campo-debitos', 'campo-despachante', 'campo-placa', 'campo-averbacao', 'regras-comitente-bloco'];
 const ROTULO = {
-  lance: 'Valor do lance', remocao: 'Remoção', debitos: 'Débitos', despachante: 'Despachante', placa: 'Placa Mercosul',
-  guincho: 'Guincho', outros: 'Outros custos', orcamento: 'Quanto quer gastar', fipe: 'FIPE',
+  lance: 'Seu lance', remocao: 'Taxa de remoção', debitos: 'Dívidas do veículo', despachante: 'Passar para o seu nome',
+  placa: 'Placa nova', guincho: 'Guincho', outros: 'Outros gastos', orcamento: 'Quanto pode gastar', fipe: 'Preço na FIPE',
 };
 const ICONE_ALERTA = '<svg class="na-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
 const TELEFONES = DESPACHANTE.telefones.map(([texto, numero]) => `<a href="tel:${numero}">${texto}</a>`).join(', ');
@@ -27,7 +27,7 @@ function montar() {
   $('tipos').innerHTML = Object.entries(TIPOS).map(([id, t]) => `
     <button type="button" class="na-segmento tipo" data-tipo="${id}" aria-pressed="false">
       <span class="tipo__nome">${t.nome}</span>
-      <span class="tipo__taxa">${t.adm ? `taxa adm. ${reaisInteiros(t.adm)}` : 'taxa pela faixa do lance'}</span>
+      <span class="tipo__taxa">${t.adm ? `taxa do leilão ${reaisInteiros(t.adm)}` : t.descricao}</span>
     </button>`).join('');
   $('comitente').innerHTML = COMITENTES.map((c) => `<option value="${c.id}">${c.nome}</option>`).join('');
 }
@@ -85,15 +85,15 @@ function lerCampo(id) {
 function dicaRemocao(c) {
   const nomeTipo = TIPOS[tipo].nome.toLowerCase();
   const valor = remocaoDoEdital(c.id, tipo);
-  if (valor !== null) return `Edital: ${reaisInteiros(valor)} para ${nomeTipo} (item ${c.itemRemocao}).`;
-  if (c.remocao) return `O edital não fixa remoção de ${nomeTipo} para este comitente. Se o lote cobrar, informe aqui.`;
-  return 'Este comitente não fixa remoção no edital. Se o lote cobrar, informe aqui (item 76).';
+  if (valor !== null) return `É o guincho que levou o veículo até o pátio do leilão. Este vendedor cobra ${reaisInteiros(valor)} por ${nomeTipo}.`;
+  if (c.remocao) return `Este vendedor não tem valor fixo para ${nomeTipo}. Se o anúncio do lote cobrar, escreva aqui.`;
+  return 'É o guincho que levou o veículo até o pátio. Este vendedor não tem valor fixo: se o anúncio do lote cobrar, escreva aqui.';
 }
 
 function dicaDebitos(c) {
-  if (c.tetoDebitos === null) return 'Sem teto neste comitente: todos os débitos anteriores são seus. Informe o valor.';
-  if (c.tetoDebitos === 0) return 'Os débitos anteriores ao leilão ficam com o comitente.';
-  return `Vazio = pior caso: ${reaisInteiros(c.tetoDebitos)}, o máximo que fica com você. Acima disso, o comitente paga.`;
+  if (c.tetoDebitos === null) return 'Com este vendedor, todas as dívidas antigas são suas, sem limite. Escreva o valor que aparece no anúncio.';
+  if (c.tetoDebitos === 0) return 'Com este vendedor, as dívidas antigas ficam com ele. Você não paga.';
+  return `Não sabe? Deixe em branco: a conta usa ${reaisInteiros(c.tetoDebitos)}, o máximo que você paga com este vendedor. O que passar disso, ele paga.`;
 }
 
 const linhas = (lista) => lista.map((l) =>
@@ -135,27 +135,27 @@ function desenhar() {
   $('campo-gravame').hidden = !(r.veiculo && c.gravamePR);
   $('remocao-dica').textContent = dicaRemocao(c);
   $('debitos-dica').textContent = dicaDebitos(c);
-  const extras = r.veiculo ? 'Documentação e extras' : 'Extras';
+  const extras = r.veiculo ? 'Documentos e outros gastos' : 'Outros gastos';
   $('t-doc').textContent = extras;
   $('linhas-doc-titulo').textContent = extras;
-  $('sub-doc-rotulo').textContent = r.veiculo ? 'Documentação, estimada' : 'Extras';
-  $('t-resultado').textContent = r.veiculo ? 'Custo total para ter o veículo no seu nome' : 'Custo total do lote';
+  $('sub-doc-rotulo').textContent = r.veiculo ? 'Documentos e gastos (estimativa)' : 'Outros gastos';
+  $('t-resultado').textContent = r.veiculo ? 'Total para ter o veículo no seu nome' : 'Total para levar o lote';
 
   // resultado
   $('total').textContent = temLance ? reais(r.total) : '—';
   $('total').classList.toggle('is-vazio', !temLance);
-  if (!temLance) $('acrescimo').textContent = 'Digite o lance para ver quanto o lote custa de verdade.';
-  else if (r.lance > 0) $('acrescimo').textContent = `${reais(r.acrescimo)} a mais que o lance (+${porcento(r.acrescimo / r.lance)})`;
-  else $('acrescimo').textContent = `${reais(r.acrescimo)} só de custos`;
+  if (!temLance) $('acrescimo').textContent = 'Digite o lance para ver quanto vai gastar de verdade.';
+  else if (r.lance > 0) $('acrescimo').textContent = `${reais(r.acrescimo)} a mais que o lance (${porcento(r.acrescimo / r.lance)} a mais)`;
+  else $('acrescimo').textContent = `${reais(r.acrescimo)} só de taxas e gastos`;
   $('formula').textContent = r.veiculo
-    ? `Conta: lance + 5% de comissão + ${reais(r.fixos)} de custos fixos deste lote.`
-    : 'Conta: lance + 5% de comissão + taxa pela faixa do lance + extras.';
+    ? `Como a conta é feita: seu lance + 5% de comissão + ${reais(r.fixos)} de taxas e gastos que não mudam com o lance.`
+    : 'Como a conta é feita: seu lance + 5% de comissão + taxa do leilão (muda conforme o lance) + outros gastos.';
 
   const avisos = [];
   const invalidos = DINHEIRO.filter((id) => v[id] === undefined);
-  if (invalidos.length) avisos.push(`Valor inválido em ${invalidos.map((id) => ROTULO[id]).join(', ')}. A conta ignora o campo até corrigir.`);
+  if (invalidos.length) avisos.push(`Não entendi o valor em: ${invalidos.map((id) => ROTULO[id]).join(', ')}. Use só números, como 15000 ou 1.234,56.`);
   if (r.veiculo && r.debitos.semTeto && r.debitos.informado === null) {
-    avisos.push(`${c.nome}: os débitos anteriores são todos seus e o edital não dá teto. Informe o valor para a conta ficar completa.`);
+    avisos.push(`Com ${c.nome}, todas as dívidas antigas do veículo são suas, sem limite. Escreva o valor das dívidas para a conta ficar certa.`);
   }
   $('avisos').innerHTML = avisos.map((t) => `<div class="na-alerta na-alerta--aviso" role="status">${ICONE_ALERTA}<span class="na-alerta__texto">${t}</span></div>`).join('');
 
@@ -163,37 +163,37 @@ function desenhar() {
   $('sub-leilao').textContent = reais(r.totalLeilao);
   $('sub-doc').textContent = reais(r.totalDoc);
   $('linhas-leilao').innerHTML = linhas(r.leilao);
-  $('linhas-doc').innerHTML = r.doc.length ? linhas(r.doc) : '<div class="linha"><dt>Nenhum extra informado</dt><dd>R$ 0,00</dd></div>';
-  $('caucao').innerHTML = `No arremate: cheque caução de <strong>${reais(r.caucaoCheque)}</strong> (35% do lance) ou a comissão de <strong>${reais(r.caucaoDebito)}</strong> no débito (item 81). O resto em 1 dia útil, das 9h às 16h30 (item 82).`;
+  $('linhas-doc').innerHTML = r.doc.length ? linhas(r.doc) : '<div class="linha"><dt>Nenhum gasto extra</dt><dd>R$ 0,00</dd></div>';
+  $('caucao').innerHTML = `Quando ganhar o lance: deixe um cheque de <strong>${reais(r.caucaoCheque)}</strong> como garantia (35% do lance) ou pague a comissão de <strong>${reais(r.caucaoDebito)}</strong> no cartão de débito. O resto, pague até 1 dia útil depois, das 9h às 16h30.`;
 
   // limite e FIPE
   if (typeof v.orcamento !== 'number') $('limite-resultado').textContent = '';
   else {
     const maximo = lanceMaximo(v.orcamento, entrada);
     $('limite-resultado').innerHTML = maximo === null
-      ? `Não cabe: só os custos fixos deste lote já somam ${reais(calcular({ ...entrada, lance: 0 }).total)}.`
-      : `Lance máximo: <strong>${reais(maximo * 100)}</strong>. Acima disso, o total passa de ${reais(Math.round(v.orcamento * 100))}.`;
+      ? `Não dá: só as taxas e gastos deste lote já somam ${reais(calcular({ ...entrada, lance: 0 }).total)}.`
+      : `Dê no máximo <strong>${reais(maximo * 100)}</strong> de lance. Passou disso, o total fica acima de ${reais(Math.round(v.orcamento * 100))}.`;
   }
   if (!(v.fipe > 0)) $('fipe-resultado').textContent = '';
   else if (!temLance) $('fipe-resultado').textContent = 'Digite o lance para comparar com a FIPE.';
   else {
     const fipe = Math.round(v.fipe * 100);
     const diferenca = fipe - r.total;
-    $('fipe-resultado').innerHTML = `Custo total = <strong>${porcento(r.total / fipe)}</strong> da FIPE: ${reais(Math.abs(diferenca))} ${diferenca >= 0 ? 'abaixo' : 'acima'} dela.`;
+    $('fipe-resultado').innerHTML = `Você vai pagar <strong>${porcento(r.total / fipe)}</strong> do preço de mercado: ${reais(Math.abs(diferenca))} ${diferenca >= 0 ? 'a menos' : 'a mais'} que a FIPE.`;
   }
 
   // regras
-  $('regras-comitente-titulo').textContent = c.nome;
+  $('regras-comitente-titulo').textContent = `Regras de quem vende: ${c.nome}`;
   $('regras-comitente').innerHTML = c.regras.map((t) => `<li>${t}</li>`).join('');
   $('regras-gerais').innerHTML = [
-    `Desistir ou não pagar: perde 35% do lance${temLance ? ` (${reais(r.perdaDesistencia)})` : ''}. O lance não tem volta.`,
-    `Retire em até 5 dias úteis. Depois, diária de ${reais(r.diaria)} (itens 93 e 94).`,
-    r.veiculo && `Despachante credenciado obrigatório: ${DESPACHANTE.nome}. Cote antes do leilão: ${TELEFONES} (item 29).`,
-    r.veiculo && 'Documentos em até 45 dias úteis do comitente + 30 dias úteis do despachante (item 25).',
-    r.veiculo && 'Remarcação de chassi ou motor, laudos ECV e CSV e troca de categoria por sua conta (itens 3, 4 e 22).',
-    r.veiculo && 'Reclamação só de motor fundido ou câmbio travado, em veículo acima de 2016 (exceto Itaú), antes de sair do pátio (item 14).',
-    'Lance condicional: espere até 5 dias úteis; se liberado, pague em 24 horas (itens 15 e 16).',
-    'Primeira compra online: só 1 lote, salvo liberação do leiloeiro (item 130).',
+    `Deu o lance, não tem volta: se desistir ou não pagar, perde 35% do lance${temLance ? `, ${reais(r.perdaDesistencia)}` : ''} (item 84).`,
+    `Tire ${r.veiculo ? 'o veículo' : 'o lote'} do pátio em até 5 dias úteis. Depois disso, paga ${reais(r.diaria)} por dia (itens 93 e 94).`,
+    r.veiculo && `A transferência tem que ser feita pelo despachante do leilão, a Mezzalira. Ligue antes e pergunte o preço: ${TELEFONES} (item 29).`,
+    r.veiculo && 'Os documentos podem demorar: até 45 dias úteis para chegar ao despachante e mais 30 dias úteis com ele (item 25).',
+    r.veiculo && 'Problema no número do chassi ou do motor, laudos de vistoria e troca de categoria (de aluguel para particular, por exemplo) ficam por sua conta (itens 3, 4 e 22).',
+    r.veiculo && 'Só aceitam reclamação de motor fundido ou câmbio travado, em veículo de 2017 para cima (menos os do Itaú), e antes de o veículo sair do pátio (item 14).',
+    'Lance condicional (quando o vendedor ainda vai decidir se aceita o valor): espere até 5 dias úteis; se aceitarem, pague em 24 horas (itens 15 e 16).',
+    'Primeira compra pela internet: só pode levar 1 lote, a não ser que o leiloeiro libere mais (item 130).',
   ].filter(Boolean).map((t) => `<li>${t}</li>`).join('');
 
   $('lance-total-linha').hidden = !temLance;

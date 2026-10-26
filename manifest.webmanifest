@@ -1,6 +1,6 @@
 {
-  "name": "Calculadora de arremate",
-  "short_name": "Arremate",
+  "name": "Calculadora do leilão",
+  "short_name": "Leilão",
   "description": "Quanto custa o lance de verdade no leilão.",
   "lang": "pt-BR",
   "start_url": "./",
