@@ -16,7 +16,8 @@ const ROTULO = {
   placa: 'Placa nova', guincho: 'Guincho', outros: 'Outros gastos', orcamento: 'Quanto pode gastar', fipe: 'Preço na FIPE',
 };
 const ICONE_ALERTA = '<svg class="na-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
-const TELEFONES = DESPACHANTE.telefones.map(([texto, numero]) => `<a href="tel:${numero}">${texto}</a>`).join(', ');
+// um botão por número: link dentro do texto com área de toque aumentada invade o número da linha de baixo
+const TELEFONES = `<span class="telefones">${DESPACHANTE.telefones.map(([texto, numero]) => `<a class="telefone" href="tel:${numero}">${texto}</a>`).join('')}</span>`;
 
 let tipo = 'leve';
 let placaEditada = false;
@@ -194,7 +195,7 @@ function desenhar() {
     'No site do leilão, o botão "+ Despesas" de cada lote mostra a conta oficial do leilão para o lance atual. Use para conferir.',
     `Deu o lance, não tem volta: se desistir ou não pagar, perde 35% do lance${temLance ? `, ${reais(r.perdaDesistencia)}` : ''} (item 84).`,
     `Tire ${r.veiculo ? 'o veículo' : 'o lote'} do pátio em até 5 dias úteis. Depois disso, paga ${reais(r.diaria)} por dia (itens 93 e 94).`,
-    r.veiculo && `A transferência tem que ser feita pelo despachante do leilão, a Mezzalira. Ligue antes e pergunte o preço: ${TELEFONES} (item 29).`,
+    r.veiculo && `A transferência tem que ser feita pelo despachante do leilão, a Mezzalira. Ligue antes e pergunte o preço (item 29): ${TELEFONES}`,
     r.veiculo && 'Os documentos podem demorar: até 45 dias úteis para chegar ao despachante e mais 30 dias úteis com ele (item 25).',
     r.veiculo && 'Problema no número do chassi ou do motor, laudos de vistoria e troca de categoria (de aluguel para particular, por exemplo) ficam por sua conta (itens 3, 4 e 22).',
     r.veiculo && 'Só aceitam reclamação de motor fundido ou câmbio travado, em veículo de 2017 para cima (menos os do Itaú), e antes de o veículo sair do pátio (item 14).',

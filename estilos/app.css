@@ -57,6 +57,8 @@ body { margin: 0; background: var(--bg); }
 .campo-dinheiro .na-input { width: 100%; padding-left: 44px; font-variant-numeric: tabular-nums; }
 /* a borda do DS (--border) dá 1,2:1; campo branco em cartão branco precisa de 3:1 para aparecer */
 .campo-dinheiro .na-input:not(:focus):not([aria-invalid="true"]), .na-select .na-input:not(:focus) { border-color: var(--muted); }
+/* com a borda escura em repouso, só a cor da borda não mostra o foco: volta o contorno sólido do DS */
+.campo-dinheiro .na-input:focus-visible, .na-select .na-input:focus-visible { outline: 3px solid var(--focus-color); outline-offset: 2px; }
 .campos-lado { align-items: start; } /* campos lado a lado com dicas de tamanho diferente não descem */
 .campo-dinheiro--grande .na-input { height: 64px; padding-left: 58px; font-size: 1.75rem; font-weight: var(--weight-bold); }
 .campo-dinheiro--grande .campo-dinheiro__prefixo { left: 18px; font-size: var(--text-heading-sm); }
@@ -122,6 +124,11 @@ body { margin: 0; background: var(--bg); }
 .regras__titulo { margin: var(--space-4) 0 var(--space-2); font-size: var(--text-label); font-weight: var(--weight-bold); color: var(--fg); }
 .regras { display: grid; gap: var(--space-2); margin: 0; padding-left: 1.15em; font-size: var(--text-label); color: var(--fg-2); }
 .regras a { color: var(--accent-text); font-weight: var(--weight-semibold); white-space: nowrap; }
+.telefones { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+.telefone {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--space-3);
+  border-radius: var(--radius-md); background: var(--selected); text-decoration: none;
+}
 
 .link { color: var(--accent-text); font-weight: var(--weight-semibold); }
 
@@ -135,7 +142,7 @@ body { margin: 0; background: var(--bg); }
 @media (max-width: 1023px) {
   html { scroll-padding-bottom: calc(96px + env(safe-area-inset-bottom)); } /* o Tab não deixa campo atrás da barra */
   .incrementos .na-btn, .cab__acao { min-height: 44px; }
-  .regras a, .link { padding-block: 14px; } /* alvo de toque de ~44 px sem mexer na linha do texto */
+  .link { display: inline-block; padding-block: 10px; } /* alvo de ~37 px; inline-block cresce a linha e não invade a vizinha */
   .pagina { padding: var(--space-4) var(--space-4) calc(88px + env(safe-area-inset-bottom)); }
   .barra-total {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; align-items: center; justify-content: space-between;
