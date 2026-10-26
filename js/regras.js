@@ -51,20 +51,18 @@ export const COMITENTES = [
   {
     id: 'itau',
     nome: 'Banco Itaú',
-    remocao: { moto: 200, leve: 400, pesado: 800 },
-    itemRemocao: 36,
     tetoDebitos: 500,
     gravamePR: 37.5,
     regras: [
       'Dívidas antigas do veículo (IPVA, multas): você paga até R$ 500. O que passar disso o banco devolve, se você pedir em até 120 dias (itens 33 a 35).',
       'O Itaú passa o veículo para o nome do banco em São Paulo. Se você mora em outro estado, os gastos para levar o documento para lá são seus (item 31).',
       'Se for transferir no Paraná e o documento ainda mostrar o financiamento, paga mais R$ 37,50 (item 32).',
+      'O edital prevê remoção (o guincho até o pátio): moto R$ 200, carro R$ 400, caminhão R$ 800. Só conta se aparecer no "+ Despesas" do lote (item 36).',
     ],
   },
   {
     id: 'itau-seguros',
     nome: 'Itaú Seguros (veículo batido)',
-    remocao: null,
     tetoDebitos: null,
     regras: [
       'Todas as dívidas antigas (multas e IPVA) são suas, sem limite, mesmo as que não aparecem no anúncio (item 121). Escreva o valor das dívidas.',
@@ -74,19 +72,17 @@ export const COMITENTES = [
   {
     id: 'pan',
     nome: 'Banco Pan',
-    remocao: null,
     tetoDebitos: 500,
     atpv: { SP: 123, SC: 153, RJ: 273, outra: 143 },
     regras: [
       'Não pague nenhuma dívida do veículo por conta própria: o Banco Pan não devolve o dinheiro (item 37).',
       'Se as dívidas passarem de R$ 500, avise o leiloeiro em até 30 dias. Você deposita R$ 500 para o despachante e o banco paga o resto (itens 38, 40 e 41).',
-      'O documento de venda (ATPV‑e) é por sua conta: SP R$ 123, SC R$ 153, RJ R$ 273, outros estados R$ 143 (item 45).',
+      'O documento de venda (ATPV‑e) é por sua conta e já entra em "Despesas extras do lote": SP R$ 123, SC R$ 153, RJ R$ 273, outros estados R$ 143 (item 45).',
     ],
   },
   {
     id: 'toyota',
     nome: 'Banco Toyota',
-    remocao: null,
     tetoDebitos: 500,
     regras: [
       'Dívidas antigas: você paga até R$ 500. O que passar disso o banco devolve depois de analisar, se você pedir em até 90 dias (itens 51 e 52).',
@@ -96,32 +92,28 @@ export const COMITENTES = [
   {
     id: 'safra',
     nome: 'Banco Safra ou J. Safra',
-    remocao: { moto: null, leve: 370, pesado: 1500 },
-    itemRemocao: 54,
     tetoDebitos: 800,
     atpvFixo: 50,
     regras: [
       'Multas antigas: você paga até R$ 800. Acima disso o banco paga a diferença, se você pedir em até 90 dias (item 56).',
-      'Documento de venda (ATPV‑e): R$ 50. Taxa de remoção: carro R$ 370, caminhão R$ 1.500 (itens 54 e 55).',
+      'O documento de venda (ATPV‑e) custa R$ 50 e já entra em "Despesas extras do lote". O edital também prevê remoção (carro R$ 370, caminhão R$ 1.500), mas só conta se aparecer no "+ Despesas" do lote (itens 54 e 55).',
       'O pagamento tem que sair da sua própria conta, para a conta do Safra que o leiloeiro informar (item 85).',
     ],
   },
   {
     id: 'previsul',
     nome: 'Previsul',
-    remocao: { moto: 150, leve: 350, pesado: 800 },
-    itemRemocao: 64,
     tetoDebitos: 0,
     regras: [
       'Dívidas antigas do veículo: não pague. Mande para o leiloeiro em até 60 dias. Se pagar por conta própria, não recebe de volta (item 60).',
       'IPVA e seguro obrigatório de 2026, licenciamento e multa por atraso na transferência são seus: some em "Outros gastos" (itens 59 e 60).',
       'Vistorias, laudos e liberação de bloqueios são por sua conta. Transfira em até 30 dias e reconheça firma no termo que o leiloeiro entrega (itens 63, 66 e 67).',
+      'O edital prevê remoção: moto R$ 150, carro R$ 350, caminhão R$ 800. Só conta se aparecer no "+ Despesas" do lote (item 64).',
     ],
   },
   {
     id: 'honda',
     nome: 'Banco Honda',
-    remocao: null,
     tetoDebitos: 0,
     regras: [
       'Multas e IPVA antigos ficam com o banco, depois de analisar. Não pague nada antes de o banco responder (item 72).',
@@ -130,7 +122,6 @@ export const COMITENTES = [
   {
     id: 'itapeva',
     nome: 'Itapeva ou RCB',
-    remocao: null,
     tetoDebitos: 800,
     regras: [
       'Dívidas antigas: você paga até R$ 800; o resto é com o vendedor (item 73).',
@@ -140,7 +131,6 @@ export const COMITENTES = [
   {
     id: 'seguradora',
     nome: 'Outra seguradora (veículo batido)',
-    remocao: null,
     tetoDebitos: 1000,
     regras: [
       'Dívidas antigas: você paga até R$ 1.000. O que passar disso é devolvido com comprovante, se você pedir em até 120 dias (itens 124 a 126).',
@@ -150,12 +140,11 @@ export const COMITENTES = [
   {
     id: 'demais',
     nome: 'Outro vendedor (não está na lista)',
-    remocao: null,
     tetoDebitos: 1000,
     regras: [
       'Dívidas antigas: você paga até R$ 1.000. O que passar disso é devolvido depois de análise, se você pedir em até 120 dias (item 78).',
       'IPVA e licenciamento de 2024 e 2025 ficam com você (item 75).',
-      'Se tiver taxa de remoção, ela vem escrita no anúncio do lote (item 76).',
+      'Remoção ou outra despesa do lote aparece no "+ Despesas" do site (item 76).',
     ],
   },
 ];

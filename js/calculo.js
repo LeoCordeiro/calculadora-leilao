@@ -7,7 +7,7 @@ import { reais } from './dinheiro.js';
 const cent = (valor) => Math.round((valor ?? 0) * 100);
 const soma = (linhas) => linhas.reduce((total, linha) => total + linha.valor, 0);
 
-// Campo omitido (undefined) usa o padrão; remoção e placa omitidas usam o edital e a estimativa do tipo.
+// Campo omitido (undefined) usa o padrão; despesas extras e placa omitidas usam o edital e a estimativa do tipo.
 export const PADRAO = {
   lance: null,
   tipo: 'leve',
@@ -31,7 +31,15 @@ export function taxaMateriais(lance) {
   return taxa;
 }
 
-export const remocaoDoEdital = (comitenteId, tipo) => comitentePorId(comitenteId).remocao?.[tipo] ?? null;
+// "Despesas extras do lote" = o que o "+ Despesas" do site soma além de lance, comissão e despesa adm.
+// O padrão é só o que o edital garante (ATPV-e do Pan e do Safra). Remoção e "Despesa Assessoria" mudam
+// por lote: no leilão 15647 os lotes do Safra cobraram só os R$ 50 do ATPV-e, e um da Ford cobrou R$ 250 de assessoria.
+export function extrasDoEdital(comitenteId, uf, tipo) {
+  if (tipo === 'material') return 0;
+  const c = comitentePorId(comitenteId);
+  if (c.atpv) return c.atpv[uf] ?? c.atpv.outra;
+  return c.atpvFixo ?? 0;
+}
 
 function notaDebitos(d) {
   if (d.semTeto) return d.informado === null ? 'sem limite com este vendedor: escreva o valor' : 'todas são suas';
@@ -61,17 +69,12 @@ export function calcular(entrada) {
     leilao.push({ id: 'adm', rotulo: 'Taxa do leilão', valor: cent(taxaMateriais(e.lance ?? 0)), nota: 'muda conforme o valor do lance' });
   } else {
     leilao.push({ id: 'adm', rotulo: 'Taxa do leilão', valor: cent(TIPOS[tipo].adm), nota: 'valor fixo por veículo ("despesas administrativas")' });
+  }
 
-    const remocao = e.remocao ?? remocaoDoEdital(c.id, tipo) ?? 0;
-    if (remocao > 0) leilao.push({ id: 'remocao', rotulo: 'Taxa de remoção', valor: cent(remocao), nota: 'guincho que levou o veículo até o pátio' });
+  const extras = e.extras ?? extrasDoEdital(c.id, e.uf, tipo);
+  if (extras > 0) leilao.push({ id: 'extras', rotulo: 'Despesas extras do lote', valor: cent(extras), nota: 'como no "+ Despesas" do site' });
 
-    if (c.atpv) {
-      const uf = c.atpv[e.uf] === undefined ? 'outra' : e.uf;
-      leilao.push({ id: 'atpv', rotulo: 'Documento de venda (ATPV‑e)', valor: cent(c.atpv[uf]), nota: `veículo registrado em ${uf === 'outra' ? 'outro estado' : uf}` });
-    } else if (c.atpvFixo) {
-      leilao.push({ id: 'atpv', rotulo: 'Documento de venda (ATPV‑e)', valor: cent(c.atpvFixo), nota: 'valor fixo deste vendedor' });
-    }
-
+  if (veiculo) {
     if (e.empilhadeira) leilao.push({ id: 'empilhadeira', rotulo: 'Empilhadeira', valor: cent(EMPILHADEIRA), nota: 'para tirar o veículo do lugar' });
 
     debitos.semTeto = c.tetoDebitos === null;

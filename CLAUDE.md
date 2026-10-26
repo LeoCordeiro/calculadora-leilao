@@ -11,7 +11,7 @@
 - Edital novo: mudar `regras.js` e `teste/calculo.test.js` juntos; todo valor cita o item.
 - Textos da tela para leigo (pedido dele, 26/10): sem jargão ou com o jargão explicado ("Quem está vendendo" = comitente; "Taxa do leilão" = despesas administrativas; "Dívidas" = débitos). Item do edital só nas regras, entre parênteses.
 - Leituras do edital: ATPV-e por UF (item 45) só para o Pan (está na seção dele); a tabela de taxa é de MATERIAIS (vem logo após "MATERIAIS: arrematação"); débitos vazios = pior caso (o teto do comitente); "Demais comitentes" tem teto de R$ 1.000, mas o item 75 diz que IPVA e licenciamento 2024/2025 são do comprador (a tela avisa).
-- Remoção é preenchida pelo edital a cada troca de comitente ou tipo (sobrescreve o que a pessoa digitou); placa só enquanto ela não editou.
+- A conta do leilão segue o "+ Despesas" de cada lote no site (milanleiloes.com.br): lance + 5% + despesa adm. + "Despesas extras do lote". O padrão das extras é só o ATPV-e do edital (Pan por UF, Safra R$ 50) e volta a ele a cada troca de vendedor, estado ou tipo; remoção e "Despesa Assessoria" só entram se o site mostrar (26/10: lotes do Safra cobraram só R$ 50; um da Ford, R$ 250 de assessoria). Os testes guardam esses totais reais. Placa volta ao padrão só enquanto a pessoa não editou.
 - `[hidden]` precisa de `display: none !important`: o DS põe `display` em `.na-field` e `.na-check`.
 - No celular o total fica colado no lance (com o teclado aberto a barra fixa some atrás dele) e na barra de baixo quando os dois saem da tela.
 - Ícones PNG gerados do `icone.svg` (Chrome headless + PIL). Trocou o SVG: gerar de novo.

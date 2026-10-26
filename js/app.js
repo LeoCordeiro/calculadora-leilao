@@ -1,18 +1,18 @@
 // Tela da calculadora: lê os campos, chama calcular() e desenha o resultado.
 // O que foi digitado fica só neste aparelho (localStorage).
 import { COMITENTES, DESPACHANTE, ESTIMATIVAS, TIPOS } from './regras.js';
-import { calcular, lanceMaximo, remocaoDoEdital } from './calculo.js';
+import { calcular, extrasDoEdital, lanceMaximo } from './calculo.js';
 import { lerValor, porcento, reais, reaisInteiros, valorNoCampo } from './dinheiro.js';
 
 const $ = (id) => document.getElementById(id);
-const CHAVE = 'calculadora-leilao:v1';
+const CHAVE = 'calculadora-leilao:v2'; // v2: "remocao" virou "extras"
 const ERRO_VALOR = 'Use só números, como 15000 ou 1.234,56.';
-const DINHEIRO = ['lance', 'remocao', 'debitos', 'despachante', 'placa', 'guincho', 'outros', 'orcamento', 'fipe'];
+const DINHEIRO = ['lance', 'extras', 'debitos', 'despachante', 'placa', 'guincho', 'outros', 'orcamento', 'fipe'];
 const MARCAS = ['gravame', 'empilhadeira', 'averbacao'];
 const UFS = ['SP', 'SC', 'RJ', 'outra'];
-const SO_VEICULO = ['campo-comitente', 'campo-remocao', 'campo-marcas', 'campo-debitos', 'campo-despachante', 'campo-placa', 'campo-averbacao', 'regras-comitente-bloco'];
+const SO_VEICULO = ['campo-comitente', 'campo-marcas', 'campo-debitos', 'campo-despachante', 'campo-placa', 'campo-averbacao', 'regras-comitente-bloco'];
 const ROTULO = {
-  lance: 'Seu lance', remocao: 'Taxa de remoção', debitos: 'Dívidas do veículo', despachante: 'Passar para o seu nome',
+  lance: 'Seu lance', extras: 'Despesas extras do lote', debitos: 'Dívidas do veículo', despachante: 'Passar para o seu nome',
   placa: 'Placa nova', guincho: 'Guincho', outros: 'Outros gastos', orcamento: 'Quanto pode gastar', fipe: 'Preço na FIPE',
 };
 const ICONE_ALERTA = '<svg class="na-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>';
@@ -32,8 +32,8 @@ function montar() {
   $('comitente').innerHTML = COMITENTES.map((c) => `<option value="${c.id}">${c.nome}</option>`).join('');
 }
 
-function aplicarRemocaoDoEdital() {
-  $('remocao').value = valorNoCampo(remocaoDoEdital($('comitente').value, tipo) ?? 0);
+function aplicarExtrasDoEdital() {
+  $('extras').value = valorNoCampo(extrasDoEdital($('comitente').value, $('uf').value, tipo));
 }
 
 function aplicarPlacaPadrao() {
@@ -46,7 +46,7 @@ function padroes() {
   $('uf').value = 'SP';
   $('despachante').value = valorNoCampo(ESTIMATIVAS.despachante);
   $('averbacao').checked = true;
-  aplicarRemocaoDoEdital();
+  aplicarExtrasDoEdital();
   aplicarPlacaPadrao();
 }
 
@@ -82,12 +82,12 @@ function lerCampo(id) {
   return valor;
 }
 
-function dicaRemocao(c) {
-  const nomeTipo = TIPOS[tipo].nome.toLowerCase();
-  const valor = remocaoDoEdital(c.id, tipo);
-  if (valor !== null) return `É o guincho que levou o veículo até o pátio do leilão. Este vendedor cobra ${reaisInteiros(valor)} por ${nomeTipo}.`;
-  if (c.remocao) return `Este vendedor não tem valor fixo para ${nomeTipo}. Se o anúncio do lote cobrar, escreva aqui.`;
-  return 'É o guincho que levou o veículo até o pátio. Este vendedor não tem valor fixo: se o anúncio do lote cobrar, escreva aqui.';
+function dicaExtras(c, veiculo) {
+  const comoVer = 'No site, abra o lote e clique em "+ Despesas". Escreva aqui o que aparecer além do lance, da comissão e da despesa adm. (ex.: "Despesas Extras", "Despesa Assessoria").';
+  if (!veiculo) return comoVer;
+  if (c.atpv) return `${comoVer} Para o Banco Pan já vem o documento de venda (ATPV‑e) do estado escolhido.`;
+  if (c.atpvFixo) return `${comoVer} Para este vendedor já vem ${reaisInteiros(c.atpvFixo)} do documento de venda (ATPV‑e).`;
+  return comoVer;
 }
 
 function dicaDebitos(c) {
@@ -112,7 +112,7 @@ function desenhar() {
     uf: $('uf').value,
     gravamePR: $('gravame').checked,
     empilhadeira: $('empilhadeira').checked,
-    remocao: v.remocao ?? 0,
+    extras: v.extras ?? 0,
     debitos: v.debitos ?? null,
     despachante: v.despachante ?? 0,
     placa: v.placa ?? 0,
@@ -133,11 +133,11 @@ function desenhar() {
   for (const id of SO_VEICULO) $(id).hidden = !r.veiculo;
   $('campo-uf').hidden = !(r.veiculo && c.atpv);
   $('campo-gravame').hidden = !(r.veiculo && c.gravamePR);
-  $('remocao-dica').textContent = dicaRemocao(c);
+  $('extras-dica').textContent = dicaExtras(c, r.veiculo);
   $('debitos-dica').textContent = dicaDebitos(c);
-  const extras = r.veiculo ? 'Documentos e outros gastos' : 'Outros gastos';
-  $('t-doc').textContent = extras;
-  $('linhas-doc-titulo').textContent = extras;
+  const tituloGastos = r.veiculo ? 'Documentos e outros gastos' : 'Outros gastos';
+  $('t-doc').textContent = tituloGastos;
+  $('linhas-doc-titulo').textContent = tituloGastos;
   $('sub-doc-rotulo').textContent = r.veiculo ? 'Documentos e gastos (estimativa)' : 'Outros gastos';
   $('t-resultado').textContent = r.veiculo ? 'Total para ter o veículo no seu nome' : 'Total para levar o lote';
 
@@ -186,6 +186,7 @@ function desenhar() {
   $('regras-comitente-titulo').textContent = `Regras de quem vende: ${c.nome}`;
   $('regras-comitente').innerHTML = c.regras.map((t) => `<li>${t}</li>`).join('');
   $('regras-gerais').innerHTML = [
+    'No site do leilão, o botão "+ Despesas" de cada lote mostra a conta oficial do leilão para o lance atual. Use para conferir.',
     `Deu o lance, não tem volta: se desistir ou não pagar, perde 35% do lance${temLance ? `, ${reais(r.perdaDesistencia)}` : ''} (item 84).`,
     `Tire ${r.veiculo ? 'o veículo' : 'o lote'} do pátio em até 5 dias úteis. Depois disso, paga ${reais(r.diaria)} por dia (itens 93 e 94).`,
     r.veiculo && `A transferência tem que ser feita pelo despachante do leilão, a Mezzalira. Ligue antes e pergunte o preço: ${TELEFONES} (item 29).`,
@@ -211,7 +212,7 @@ document.addEventListener('input', (ev) => {
 
 document.addEventListener('change', (ev) => {
   const { id } = ev.target;
-  if (id === 'comitente') aplicarRemocaoDoEdital();
+  if (id === 'comitente' || id === 'uf') aplicarExtrasDoEdital();
   if (id === 'comitente' || id === 'uf' || MARCAS.includes(id)) desenhar();
 });
 
@@ -228,7 +229,7 @@ $('tipos').addEventListener('click', (ev) => {
   const botao = ev.target.closest('[data-tipo]');
   if (!botao || botao.dataset.tipo === tipo) return;
   tipo = botao.dataset.tipo;
-  aplicarRemocaoDoEdital();
+  aplicarExtrasDoEdital();
   aplicarPlacaPadrao();
   desenhar();
 });
@@ -246,7 +247,7 @@ $('novo-lote').addEventListener('click', () => {
   $('gravame').checked = false;
   $('empilhadeira').checked = false;
   placaEditada = false;
-  aplicarRemocaoDoEdital();
+  aplicarExtrasDoEdital();
   aplicarPlacaPadrao();
   desenhar();
   $('lance').focus();

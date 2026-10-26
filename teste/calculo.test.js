@@ -7,10 +7,17 @@ const valor = (r, id) => [...r.leilao, ...r.doc].find((l) => l.id === id)?.valor
 
 test('lance de R$ 15.000 em carro do Itaú com as estimativas padrão', () => {
   const r = calcular({ lance: 15000, tipo: 'leve', comitente: 'itau' });
-  assert.equal(r.totalLeilao, 1850000); // 15.000 + 750 + 2.350 + 400 de remoção
+  assert.equal(r.totalLeilao, 1810000); // 15.000 + 750 + 2.350
   assert.equal(r.totalDoc, 179523); // 500 de débitos (pior caso) + 900 + 200 + 195,23
-  assert.equal(r.total, 2029523);
-  assert.equal(r.fixos, 2029523 - 1500000 - 75000);
+  assert.equal(r.total, 1989523);
+  assert.equal(r.fixos, 1989523 - 1500000 - 75000);
+});
+
+// Conta oficial do site ("+ Despesas"), lida em 26/10/2026 no leilão 15647.
+test('bate com o "+ Despesas" do site: lote 029A (Honda Fit, Safra) e lote 001 (Ranger, Ford)', () => {
+  assert.equal(calcular({ lance: 1800, tipo: 'leve', comitente: 'safra' }).totalLeilao, 429000); // 1.800 + 90 + 2.350 + 50
+  assert.equal(calcular({ lance: 54000, tipo: 'leve', comitente: 'safra' }).totalLeilao, 5910000); // lote 002
+  assert.equal(calcular({ lance: 120900, tipo: 'leve', comitente: 'demais', extras: 250 }).totalLeilao, 12954500); // assessoria
 });
 
 test('despesas administrativas e diária por tipo (itens 83 e 94)', () => {
@@ -21,21 +28,15 @@ test('despesas administrativas e diária por tipo (itens 83 e 94)', () => {
   assert.deepEqual(['moto', 'leve', 'pesado', 'material'].map((tipo) => calcular({ tipo }).diaria), [2000, 5000, 8000, 3000]);
 });
 
-test('remoção pelo edital, por comitente e tipo', () => {
-  const remocao = (comitente, tipo) => valor(calcular({ lance: 1000, comitente, tipo }), 'remocao');
-  assert.deepEqual(['moto', 'leve', 'pesado'].map((t) => remocao('itau', t)), [20000, 40000, 80000]);
-  assert.deepEqual(['moto', 'leve', 'pesado'].map((t) => remocao('safra', t)), [undefined, 37000, 150000]);
-  assert.deepEqual(['moto', 'leve', 'pesado'].map((t) => remocao('previsul', t)), [15000, 35000, 80000]);
-  assert.equal(remocao('pan', 'leve'), undefined);
-  assert.equal(valor(calcular({ lance: 1000, comitente: 'itau', remocao: 0 }), 'remocao'), undefined);
-  assert.equal(valor(calcular({ lance: 1000, comitente: 'pan', remocao: 250 }), 'remocao'), 25000);
-});
-
-test('ATPV-e: Pan por UF (item 45), Safra fixo (item 55), demais sem', () => {
-  const atpv = (comitente, uf) => valor(calcular({ lance: 1000, comitente, uf }), 'atpv');
-  assert.deepEqual(['SP', 'SC', 'RJ', 'outra', 'PR'].map((uf) => atpv('pan', uf)), [12300, 15300, 27300, 14300, 14300]);
-  assert.equal(atpv('safra', 'RJ'), 5000);
-  assert.equal(atpv('itau', 'SP'), undefined);
+test('despesas extras do lote: padrão é o ATPV-e do edital (Pan por UF, Safra R$ 50); o site manda', () => {
+  const extras = (comitente, uf, tipo = 'leve') => valor(calcular({ lance: 1000, comitente, uf, tipo }), 'extras');
+  assert.deepEqual(['SP', 'SC', 'RJ', 'outra', 'PR'].map((uf) => extras('pan', uf)), [12300, 15300, 27300, 14300, 14300]);
+  assert.equal(extras('safra', 'RJ'), 5000);
+  assert.equal(extras('itau', 'SP'), undefined); // remoção do Itaú só se o "+ Despesas" mostrar
+  assert.equal(extras('safra', 'SP', 'material'), undefined);
+  assert.equal(valor(calcular({ lance: 1000, comitente: 'safra', extras: 0 }), 'extras'), undefined);
+  assert.equal(valor(calcular({ lance: 1000, comitente: 'itau', extras: 400 }), 'extras'), 40000);
+  assert.equal(valor(calcular({ lance: 1000, tipo: 'material', extras: 120 }), 'extras'), 12000);
 });
 
 test('gravame do Paraná só no Itaú e quando marcado (item 32)', () => {
@@ -78,8 +79,8 @@ test('comissão arredonda no centavo; caução e perda são 35% do lance', () =>
 
 test('lance máximo para um orçamento', () => {
   const e = { tipo: 'leve', comitente: 'itau' };
-  assert.equal(lanceMaximo(20295.23, e), 15000);
-  assert.equal(lanceMaximo(20295.22, e), 14999);
+  assert.equal(lanceMaximo(19895.23, e), 15000);
+  assert.equal(lanceMaximo(19895.22, e), 14999);
   assert.equal(lanceMaximo(1000, e), null);
   // material: a taxa sobe de R$ 110 para R$ 180 no lance de R$ 500
   assert.equal(lanceMaximo(704, { tipo: 'material' }), 499);
