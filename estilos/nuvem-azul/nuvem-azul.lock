@@ -1,0 +1,12 @@
+{
+  "pacote": "nuvem-azul/marca",
+  "versao": "1.0.0 (2026-10-05)",
+  "arquivos": {
+    "components.css": "37ceeacf39a3705a9a8525755a4af189dcc8a2d293094af2802f4dab382deac0",
+    "marca.css": "3a15c9e1ee3813df8a444b9f2b03fb61c9831d6c33ad4045981c9a78c3fcbe1b",
+    "tokens.css": "56b1e28ecd2f7071bb54f9af6262e3ced7b6e5f7156a0d9197e89f334b059381"
+  },
+  "extensoes": [
+    "../app.css"
+  ]
+}

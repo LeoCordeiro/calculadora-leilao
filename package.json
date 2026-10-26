@@ -1,0 +1,8 @@
+{
+  "name": "calculadora-leilao",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test teste/calculo.test.js"
+  }
+}

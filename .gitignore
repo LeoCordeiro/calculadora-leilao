@@ -1,0 +1,10 @@
+# SO / editores
+Thumbs.db
+.DS_Store
+.vscode/
+# deploy
+.wrangler/
+.vercel/
+node_modules/
+# grafo do graphify (regenera sozinho pelos ganchos)
+graphify-out/

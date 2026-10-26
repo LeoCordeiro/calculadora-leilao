@@ -1,0 +1,144 @@
+/* ==========================================================================
+   Nuvem Azul — tokens (fonte única da verdade)
+   Extraído de referência de gerenciador de arquivos (quadro 1440×900).
+   Cada cor é light-dark(claro, escuro): um valor só por token, sem bloco duplicado.
+     sem data-theme                 segue o sistema (color-scheme: light dark)
+     [data-theme="light" | "dark"]  força o tema
+     [data-fidelity="reference"]    cores exatas da imagem, para comparação (reprova AA em 7 pares)
+   A fonte NÃO é carregada aqui (bloquearia a renderização): o app carrega a Gantari no <head>.
+   Suporte de light-dark(): Chrome 123, Safari 17.5, Firefox 120.
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---- marca ---- */
+  --brand: #36a1ea;                                   /* anéis, barras, pontos, destaques (sem texto branco) */
+  --brand-rail: light-dark(#2f9ce4, #0f3050);         /* faixa lateral: ícone 3,0:1 / 13,5:1 */
+  --on-brand-rail: #ffffff;
+  --rail-item-active: light-dark(#5fbaff, #1d4f7c);
+  --accent-solid: #1a78c4;                            /* fundo com texto branco: botão, card ativo (4,64:1) */
+  --accent-solid-hover: light-dark(#156aae, #2386d6);
+  --accent-solid-tint: light-dark(#2985c8, #2b8fd8);  /* bloco "+" dentro do botão */
+  --accent-text: light-dark(#0075bb, #5ab5f2);        /* texto/link azul (≥4,5:1 em branco, seleção e aba) */
+  --on-accent: #ffffff;
+  --ring-on-accent: light-dark(#2e90d5, #3b8fd0);     /* trilho do anel dentro do card ativo */
+
+  /* ---- superfícies ---- */
+  --app-frame: light-dark(#ffffff, #152230);
+  --bg: light-dark(#f1f7fa, #0e1824);                 /* área principal */
+  --surface: light-dark(#ffffff, #152230);            /* sidebar, cards, painel, tabela, toast */
+  --surface-soft: light-dark(#f2f6f7, #1b2a3a);       /* botão quadrado, fundo de ícone de nuvem */
+  --surface-sunken: light-dark(#eaeef2, #1b2a3a);     /* tile "adicionar", skeleton */
+  --selected: light-dark(#eff7fe, #173450);           /* linha e item selecionados */
+  --tab-active: light-dark(#edf7fb, #1a3550);
+  --promo: light-dark(#f3f9fe, #182c40);              /* card de upgrade */
+
+  /* ---- texto ---- */
+  --fg: light-dark(#123a4f, #e7eef5);
+  --fg-2: light-dark(#34464c, #c3cfda);
+  --muted: light-dark(#677070, #8fa0b0);
+  --placeholder: light-dark(#757678, #8193a5);
+
+  /* ---- linhas e trilhos ---- */
+  --divider: light-dark(#f2f3f4, #1d2d3e);
+  --border: light-dark(#e3e9ed, #22344a);
+  --border-dashed: light-dark(#d4d8db, #33475c);
+  --track: light-dark(#eeeeee, #243548);
+  --scrollbar: light-dark(#dde6e5, #2a3b4e);
+  --timeline: light-dark(#eff0f1, #22344a);
+  --timeline-node: light-dark(#e8eeee, #1f3043);
+  --timeline-node-active: light-dark(#d9effc, #1a3a57);
+
+  /* ---- estado ---- */
+  --danger: light-dark(#c54350, #ff8a92);             /* texto e borda de erro */
+  --danger-bg: light-dark(#fffafa, #2a1c24);
+  --danger-solid: #c54350;                            /* fundo com texto branco (4,89:1) nos dois temas */
+  --success: light-dark(#1c8a54, #5fd49a);
+  --success-bg: light-dark(#e9f6ef, #16302a);
+  --warning: light-dark(#9a6a12, #f2c46b);
+  --overlay-media: light-dark(rgba(20, 30, 45, 0.55), rgba(5, 12, 20, 0.6));
+
+  /* ---- categorias (ícones de tipo de arquivo; iguais nos dois temas) ---- */
+  --cat-images: #6e6ef0;
+  --cat-videos: #f6645f;
+  --cat-music: #fdaf58;
+  --cat-apps: #79ddfb;
+  --cat-zip: #a8c2d6;
+  --cat-docs: #5baef9;
+  --cat-downloads: #60dc9c;
+  --cat-folder: #83c7f7;
+
+  /* ---- sombras: geometria fixa, cor por tema (no escuro vira contorno de 1px) ---- */
+  --shadow-card: 0 0 0 1px light-dark(transparent, #1f3246), 0 6px 18px light-dark(rgba(20, 45, 70, 0.04), transparent);
+  --shadow-active: 0 16px 34px -4px light-dark(rgba(30, 60, 90, 0.22), rgba(0, 0, 0, 0.5));
+  --shadow-float: 0 20px 60px light-dark(rgba(15, 35, 60, 0.12), rgba(0, 0, 0, 0.45)), 0 0 0 1px light-dark(rgba(15, 35, 60, 0.03), rgba(255, 255, 255, 0.05));
+  --focus-color: light-dark(#1a78c4, #5ab5f2);         /* anel de foco (outline, não disputa com sombra) */
+  --focus-ring: 0 0 0 3px light-dark(rgba(26, 120, 196, 0.45), rgba(90, 181, 242, 0.55));
+
+  /* ---- tipografia (px medidos no quadro 1440 → rem com raiz 16px) ---- */
+  --font-sans: "Gantari", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+  --text-caption: 0.8125rem;     /* 13   legenda, subtítulo da sidebar */
+  --text-label: 0.875rem;        /* 14   navegação, rótulos */
+  --text-control: 0.9375rem;     /* 15   abas, botões, subtítulo do card, rótulo do acesso rápido */
+  --text-body: 1.03125rem;       /* 16.5 corpo, busca, item da sidebar */
+  --text-row: 1.09375rem;        /* 17.5 título da linha de tabela */
+  --text-card-title: 1.15625rem; /* 18.5 título do card, link de seção */
+  --text-heading-sm: 1.21875rem; /* 19.5 saudação, título do toast */
+  --text-heading: 1.5625rem;     /* 25   título de seção e de painel */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --leading-tight: 1.15;
+  --leading-body: 1.3;
+
+  /* ---- espaço: escala para componentes derivados e para o app.
+          Os componentes medidos da referência usam os px exatos da imagem, de propósito. ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  /* ---- raios (medidos) ---- */
+  --radius-xs: 5px;              /* ícone de pasta */
+  --radius-sm: 6px;              /* aba, quadrado de ícone colorido */
+  --radius-control: 10px;        /* botão quadrado 28px */
+  --radius-md: 12px;             /* linha, item, botão, miniatura */
+  --radius-lg: 15px;             /* card, tile, busca, tabela, toast */
+  --radius-panel: 38px;          /* quadro, área principal, painel direito */
+  --radius-sidebar: 44px;
+  --radius-pill: 999px;
+
+  /* ---- layout (quadro 1440) ---- */
+  --rail-w: 76px;
+  --sidebar-w: 210px;
+  --panel-w: 337px;
+  --main-pad-x: 28px;
+  --main-pad-top: 31px;
+
+  /* ---- movimento ---- */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-theme="light"] { color-scheme: light; }
+[data-theme="dark"] { color-scheme: dark; }
+
+/* ---------- referência: cores exatas da imagem (só claro) ---------- */
+[data-fidelity="reference"] {
+  color-scheme: light;
+  --brand-rail: #36a1ea;
+  --accent-solid: #36a1ea;
+  --accent-solid-hover: #2f95dc;
+  --accent-text: #36a1ea;
+  --muted: #6b7474;
+  --placeholder: #aeb0b2;
+  --danger: #e5606a;
+}

@@ -1,0 +1,143 @@
+/* Calculadora de arremate: layout da tela e peças que o DS não tem.
+   Só tokens de estilos/nuvem-azul (nenhuma cor, raio, sombra ou fonte solta). */
+
+[hidden] { display: none !important; } /* o DS põe display em .na-field e .na-check */
+
+body { margin: 0; background: var(--bg); }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+
+.pagina { max-width: 1560px; margin: 0 auto; padding: var(--space-6) var(--space-6) var(--space-10); }
+
+/* ---------- cabeçalho ---------- */
+.cab { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-6); }
+.cab__marca {
+  display: grid; place-items: center; width: 44px; height: 44px; flex: none;
+  border-radius: var(--radius-md); background: var(--accent-solid); color: var(--on-accent);
+}
+.cab__textos { min-width: 0; }
+.cab__titulo { font-size: var(--text-heading); font-weight: var(--weight-bold); line-height: var(--leading-tight); }
+.cab__sub { margin-top: 2px; font-size: var(--text-label); color: var(--muted); }
+.cab__acao { margin-left: auto; flex: none; }
+
+/* ---------- grade: no celular empilha lance, resultado, documentação, limite e regras;
+   de 1024 em diante o resultado fica fixo na coluna da direita ---------- */
+.grade { display: flex; flex-direction: column; gap: var(--space-5); }
+.coluna { display: contents; }
+.bloco--lance { order: 1; }
+.bloco--resultado { order: 2; }
+.bloco--doc { order: 3; }
+.bloco--limite { order: 4; }
+.bloco--regras { order: 5; }
+
+@media (min-width: 1024px) {
+  .grade { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 420px); grid-template-rows: auto 1fr; gap: var(--space-5); }
+  .coluna { display: flex; flex-direction: column; gap: var(--space-5); min-width: 0; }
+  .coluna--a { grid-column: 1; grid-row: 1; }
+  .coluna--b { grid-column: 1; grid-row: 2; }
+  .coluna--c { grid-column: 2; grid-row: 1 / span 2; }
+  .bloco--resultado {
+    position: sticky; top: var(--space-5);
+    max-height: calc(100dvh - 2 * var(--space-5)); overflow-y: auto; overscroll-behavior: contain;
+  }
+}
+@media (min-width: 1280px) {
+  .grade { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(380px, 440px); grid-template-rows: auto; }
+  .coluna--b { grid-column: 2; grid-row: 1; }
+  .coluna--c { grid-column: 3; grid-row: 1; }
+}
+
+/* ---------- campos ---------- */
+.campos { display: grid; gap: var(--space-5); margin-top: var(--space-5); }
+.campo-dinheiro { position: relative; display: grid; }
+.campo-dinheiro__prefixo {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--muted); font-weight: var(--weight-semibold); pointer-events: none;
+}
+.campo-dinheiro .na-input { width: 100%; padding-left: 44px; font-variant-numeric: tabular-nums; }
+.campo-dinheiro--grande .na-input { height: 64px; padding-left: 58px; font-size: 1.75rem; font-weight: var(--weight-bold); }
+.campo-dinheiro--grande .campo-dinheiro__prefixo { left: 18px; font-size: var(--text-heading-sm); }
+
+.incrementos { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-1); }
+
+/* total colado no lance: no celular, com o teclado aberto, é o único total à vista */
+.lance-total {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3);
+  padding: var(--space-2) var(--space-3); border-radius: var(--radius-md); background: var(--selected);
+  font-size: var(--text-label); color: var(--fg-2);
+}
+.lance-total strong { color: var(--accent-text); font-size: var(--text-card-title); font-variant-numeric: tabular-nums; }
+@media (min-width: 1024px) { .lance-total { display: none; } }
+
+.tipos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+.tipo { /* botão .na-segmento em duas linhas: nome e taxa */
+  height: auto; min-height: 56px; flex-direction: column; align-items: flex-start; justify-content: center;
+  gap: 2px; padding: var(--space-2) var(--space-3); text-align: left;
+}
+.tipo__nome { font-weight: var(--weight-semibold); }
+.tipo__taxa { font-size: var(--text-caption); color: var(--muted); }
+.tipo.is-active .tipo__taxa { color: var(--accent-text); }
+
+.marcas { display: grid; gap: var(--space-1); }
+.check-alto { min-height: 40px; } /* alvo de toque no celular */
+
+/* ---------- resultado ---------- */
+.resultado__rotulo { font-size: var(--text-label); font-weight: var(--weight-semibold); color: var(--fg-2); }
+.resultado__total {
+  margin-top: var(--space-2); font-size: clamp(2.125rem, 1.6rem + 1.6vw, 2.75rem); font-weight: var(--weight-bold);
+  line-height: 1.05; color: var(--fg); font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
+}
+.resultado__total.is-vazio { color: var(--muted); }
+.resultado__acrescimo { margin-top: var(--space-2); font-size: var(--text-label); font-weight: var(--weight-medium); color: var(--fg-2); }
+.resultado__formula { margin-top: var(--space-1); }
+.resultado__formula:empty { display: none; }
+.resultado__partes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
+.parte { display: grid; gap: 2px; padding: var(--space-3); border-radius: var(--radius-md); background: var(--surface-soft); min-width: 0; }
+.parte__rotulo { font-size: var(--text-caption); color: var(--muted); }
+.parte__valor { font-size: var(--text-card-title); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+#avisos:not(:empty) { display: grid; gap: var(--space-2); margin-top: var(--space-4); }
+
+.linhas__titulo { margin: var(--space-5) 0 var(--space-1); font-size: var(--text-label); font-weight: var(--weight-bold); color: var(--fg); }
+.linhas { margin: 0; }
+.linha {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4);
+  padding: var(--space-2) 0; border-bottom: 1px solid var(--divider);
+}
+.linha:last-child { border-bottom: 0; }
+.linha dt { min-width: 0; font-size: var(--text-label); color: var(--fg-2); }
+.linha__nota { display: block; font-size: var(--text-caption); color: var(--muted); }
+.linha dd { margin: 0; font-size: var(--text-label); font-weight: var(--weight-semibold); color: var(--fg); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.resultado__caucao { margin-top: var(--space-4); }
+
+/* ---------- limite e FIPE ---------- */
+.destaque { padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--selected); color: var(--fg); font-size: var(--text-label); }
+.destaque:empty { display: none; }
+.destaque strong { color: var(--accent-text); font-size: var(--text-card-title); font-variant-numeric: tabular-nums; }
+
+/* ---------- regras ---------- */
+.regras__titulo { margin: var(--space-4) 0 var(--space-2); font-size: var(--text-label); font-weight: var(--weight-bold); color: var(--fg); }
+.regras { display: grid; gap: var(--space-2); margin: 0; padding-left: 1.15em; font-size: var(--text-label); color: var(--fg-2); }
+.regras a { display: inline-block; padding-block: var(--space-1); color: var(--accent-text); font-weight: var(--weight-semibold); white-space: nowrap; }
+
+.rodape { max-width: 76ch; margin-top: var(--space-8); font-size: var(--text-caption); color: var(--muted); }
+
+/* ---------- barra do total no celular: aparece quando o total sai da tela ---------- */
+.barra-total { display: none; }
+.barra-total__rotulo { font-size: var(--text-label); color: var(--muted); }
+.barra-total__valor { font-size: var(--text-heading-sm); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 1023px) {
+  .pagina { padding: var(--space-4) var(--space-4) calc(88px + env(safe-area-inset-bottom)); }
+  .barra-total {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; align-items: center; justify-content: space-between;
+    gap: var(--space-3); padding: var(--space-3) var(--space-5) calc(var(--space-3) + env(safe-area-inset-bottom));
+    background: var(--surface); color: var(--fg); text-decoration: none; box-shadow: var(--shadow-float);
+  }
+  .barra-total.is-visivel { display: flex; }
+}
+@media (max-width: 480px) {
+  .cab { gap: var(--space-3); margin-bottom: var(--space-4); }
+  .cab__marca { display: none; }
+  .cab__titulo { font-size: var(--text-heading-sm); }
+  .cab__sub { font-size: var(--text-caption); }
+}
